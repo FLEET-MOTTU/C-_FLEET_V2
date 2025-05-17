@@ -1,0 +1,23 @@
+services:
+  mottu-csharp-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+      - "8081:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - ConnectionStrings__OracleConnection=PLEASE_OVERRIDE_IN_LOCAL_SETTINGS
+
+  ef-tools:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ef-tools-env
+    volumes:
+      - .:/app 
+    environment:
+      - ConnectionStrings__OracleConnection=PLEASE_OVERRIDE_IN_LOCAL_SETTINGS_FOR_EF_TOOLS
+      - ASPNETCORE_ENVIRONMENT=Development
