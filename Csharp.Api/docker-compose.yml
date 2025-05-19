@@ -5,10 +5,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:80"
-      - "8081:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__OracleConnection=PLEASE_OVERRIDE_IN_LOCAL_SETTINGS
 
   ef-tools:
