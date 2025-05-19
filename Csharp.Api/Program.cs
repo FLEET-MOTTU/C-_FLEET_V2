@@ -3,6 +3,7 @@ using Csharp.Api.Data;
 using Csharp.Api.Services;
 using Csharp.Api.Middleware;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddScoped<IMotoService, MotoService>();
-builder.Services.AddControllers();
+builder.Services.AddScoped<IIoTEventService, IoTEventService>();
+
+builder.Services.AddControllers()
+  .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+    
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

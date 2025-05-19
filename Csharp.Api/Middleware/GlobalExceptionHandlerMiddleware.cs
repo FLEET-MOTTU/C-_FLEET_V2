@@ -53,29 +53,33 @@ namespace Csharp.Api.Middleware
 
             switch (exception)
             {
-                case MotoNotFoundException ex:
+                case MotoNotFoundException mnfEx:
                     response.StatusCode = (int)HttpStatusCode.NotFound; // 404
-                    errorMessage = ex.Message;
+                    errorMessage = mnfEx.Message;
                     break;
-                case PlacaJaExisteException ex:
-                case TagJaExisteException ex:
+
+                case PlacaJaExisteException:
+                case TagJaExisteException:
                     response.StatusCode = (int)HttpStatusCode.Conflict; // 409
-                    errorMessage = ex.Message;
+                    errorMessage = exception.Message;
                     break;
-                case EntradaInvalidaException ex:
+
+                case EntradaInvalidaException eiEx:
                     response.StatusCode = (int)HttpStatusCode.BadRequest; // 400
-                    errorMessage = ex.Message;
+                    errorMessage = eiEx.Message;
                     break;
-                case BusinessRuleException ex:
+                case BusinessRuleException brEx:
                     response.StatusCode = (int)HttpStatusCode.BadRequest; // 400
-                    errorMessage = ex.Message;
+                    errorMessage = brEx.Message;
                     break;
-                case DbUpdateConcurrencyException ex:
+                case DbUpdateConcurrencyException dbConcurrencyEx:
                     response.StatusCode = (int)HttpStatusCode.Conflict; // 409
                     errorMessage = "Os dados foram modificados por outra transação. Por favor, tente novamente.";
+                    _logger.LogWarning(dbConcurrencyEx, "Conflito");
                     break;
                 default:
                     response.StatusCode = (int)HttpStatusCode.InternalServerError; // 500
+                    errorMessage = exception.Message;
                     break;
             }
 

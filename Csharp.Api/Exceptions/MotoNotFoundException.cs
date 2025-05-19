@@ -9,13 +9,13 @@ namespace Csharp.Api.Exceptions
         {
         }
 
-        public MotoNotFoundException(string placa) 
-            : base($"A moto com placa '{placa}' não foi encontrada.") 
+        public MotoNotFoundException(string message) 
+            : base(message) 
         {
         }
 
-        public MotoNotFoundException(string message) 
-            : base(message) 
+        public MotoNotFoundException(string message, Exception innerException) 
+            : base(message, innerException) 
         {
         }
     }

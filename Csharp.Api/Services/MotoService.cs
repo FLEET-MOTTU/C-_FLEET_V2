@@ -24,15 +24,23 @@ namespace Csharp.Api.Services
                 createMotoDto.Placa ?? "N/A", createMotoDto.CodigoUnicoTagParaNovaTag);
                 
             // Regra de Negócio: Verificar se CodigoUnicoTag já existe
-            if (await _context.TagsBle.AnyAsync(t => t.CodigoUnicoTag == createMotoDto.CodigoUnicoTagParaNovaTag))
+            var tagExistente = await _context.TagsBle
+                                 .FirstOrDefaultAsync(t => t.CodigoUnicoTag == createMotoDto.CodigoUnicoTagParaNovaTag);
+            if (tagExistente != null)
             {
                 throw new TagJaExisteException(createMotoDto.CodigoUnicoTagParaNovaTag);
             }
 
             // Regra de Negócio: Verificar se Placa já existe
-            if (!string.IsNullOrWhiteSpace(createMotoDto.Placa) && await _context.Motos.AnyAsync(m => m.Placa == createMotoDto.Placa))
+            if (!string.IsNullOrWhiteSpace(createMotoDto.Placa))
             {
-                throw new PlacaJaExisteException(createMotoDto.Placa);
+                var placaNormalizada = createMotoDto.Placa.ToUpper();
+                var motoComPlacaExistente = await _context.Motos
+                                                        .FirstOrDefaultAsync(m => m.Placa == placaNormalizada);
+                if (motoComPlacaExistente != null)
+                {
+                    throw new PlacaJaExisteException(createMotoDto.Placa);
+                }
             }
 
             var novaTag = new TagBle
@@ -143,11 +151,17 @@ namespace Csharp.Api.Services
 
             // Regra de Negócio: Se a placa mudou, verificar se a nova placa já existe em outra moto
             var novaPlacaUpper = string.IsNullOrWhiteSpace(updateMotoDto.Placa) ? null : updateMotoDto.Placa.ToUpper();
-            if (novaPlacaUpper != motoExistente.Placa &&
-                !string.IsNullOrWhiteSpace(novaPlacaUpper) &&
-                await _context.Motos.AnyAsync(m => m.Id != id && m.Placa == novaPlacaUpper))
+           if (novaPlacaUpper != motoExistente.Placa &&
+                !string.IsNullOrWhiteSpace(novaPlacaUpper))
             {
-                throw new PlacaJaExisteException(updateMotoDto.Placa!);
+                var outraMotoComMesmaPlaca = await _context.Motos
+                                            .FirstOrDefaultAsync(m => m.Id != id && m.Placa == novaPlacaUpper);
+                if (outraMotoComMesmaPlaca != null)
+                {
+                    _logger.LogWarning("Tentativa de atualizar moto ID {MotoId} para placa '{NovaPlaca}' que já está registrada em outra moto ID {OutraMotoId}.", 
+                        id, novaPlacaUpper, outraMotoComMesmaPlaca.Id);
+                    throw new PlacaJaExisteException(updateMotoDto.Placa!);
+                }
             }
 
             motoExistente.Placa = novaPlacaUpper;
