@@ -4,6 +4,8 @@ using Csharp.Api.Services;
 using Csharp.Api.Middleware;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using System.Reflection;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,15 +29,23 @@ builder.Services.AddControllers()
     });
     
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen(options => 
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "Mottu Fleet API - C#",
+        Title = "Mottu Fleet API - C# (Pátio)",
         Description = "API para gerenciamento de pátios e motos da Mottu."
     });
-});
+
+    var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFilename);
+    
+    if (System.IO.File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});    
 
 var app = builder.Build();
 
