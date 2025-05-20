@@ -49,10 +49,11 @@ Para rodar esta aplicação localmente usando Docker, você precisará de:
 ## Configuração do Ambiente Local e Inicialização
 
 **1. Clonar o Repositório:**
-    ```
-    git clone https://github.com/FLEET-MOTTU/C--POC
-    cd Csharp.Api
-    ```
+
+```sh
+git clone https://github.com/FLEET-MOTTU/C--POC
+cd Csharp.Api
+```
 
 **2. Configure a Conexão com o Banco de Dados Oracle:**
     * Na pasta raiz do projeto (onde está o `docker-compose.yml`), siga as instruções do arquivo `docker-compose.override.yml.example`.
