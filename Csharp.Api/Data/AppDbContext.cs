@@ -35,6 +35,7 @@ namespace Csharp.Api.Data
             modelBuilder.Entity<TagBle>()
                 .HasIndex(tag => tag.CodigoUnicoTag)
                 .IsUnique();
+                
         }
     }
 }
