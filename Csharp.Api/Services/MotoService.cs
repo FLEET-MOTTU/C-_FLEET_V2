@@ -133,7 +133,7 @@ namespace Csharp.Api.Services
         }
 
 
-        public async Task<bool> UpdateMotoAsync(Guid id, UpdateMotoDto updateMotoDto)
+        public async Task<MotoViewDto> UpdateMotoAsync(Guid id, UpdateMotoDto updateMotoDto)
         {
             _logger.LogInformation("Tentativa de atualizar moto com ID: {MotoId}", id);
             var motoExistente = await _context.Motos.Include(m => m.Tag).FirstOrDefaultAsync(m => m.Id == id);
@@ -172,7 +172,7 @@ namespace Csharp.Api.Services
             {
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("Moto com ID {MotoId} atualizada com sucesso.", id);
-                return true;
+                return MapMotoToViewDto(motoExistente);
             }
             catch (DbUpdateConcurrencyException ex)
             {

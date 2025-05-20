@@ -31,6 +31,10 @@ namespace Csharp.Api.Data
                 .HasOne(moto => moto.Tag)
                 .WithOne(tag => tag.Moto)
                 .HasForeignKey<Moto>(moto => moto.TagBleId);
+
+            modelBuilder.Entity<TagBle>()
+                .HasIndex(tag => tag.CodigoUnicoTag)
+                .IsUnique();
         }
     }
 }

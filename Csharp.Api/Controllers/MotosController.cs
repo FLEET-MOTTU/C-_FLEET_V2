@@ -75,7 +75,7 @@ namespace Csharp.Api.Controllers
 
         // PUT: api/motos/{id}
         [HttpPut("{id:guid}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
@@ -87,8 +87,8 @@ namespace Csharp.Api.Controllers
                 _logger.LogWarning("UpdateMoto: ModelState inválido para ID {MotoId}.", id);
                 return BadRequest(ModelState);
             }
-            await _motoService.UpdateMotoAsync(id, updateMotoDto);
-            return NoContent();
+            var motoAtualizadaDto = await _motoService.UpdateMotoAsync(id, updateMotoDto);
+            return Ok(motoAtualizadaDto);
         }
 
         // DELETE: api/motos/{id}
