@@ -92,14 +92,14 @@ A documentação completa e interativa de todos os endpoints, incluindo schemas 
 
 **CRUD de motos**
 Os endpoits relacionados ao CRUD de motos podem ser testados através do Swagger ou via ferramentas de teste de API, como o Postman (seguem instruções para teste via Postman):
-    * Copie todo o conteúdo co arquivo JSON 'Mottu_CSharp_API.postman_collection' localizado na raiz do projeto
-    * Abra o Postman.
-    * Cole o contúdo do JSON 'Mottu_CSharp_API.postman_collection' na aba "Raw text", clique em "Continue" e depois em "Import".
-    * Uma nova coleção chamada "Mottu C# API - Pátio" aparecerá no Postman.
-    * IMPORTANTE: Você precisará configurar a variável de coleção baseUrl.
-        * Clique na coleção "Mottu C# API - Pátio".
-        * Vá na aba "Variables".
-        * Edite a variável baseUrl e no campo "CURRENT VALUE" coloque: http://localhost:8080 (ou a porta que a API C# estiver usando localmente).
+* Copie todo o conteúdo co arquivo JSON 'Mottu_CSharp_API.postman_collection' localizado na raiz do projeto
+* Abra o Postman.
+* Cole o contúdo do JSON 'Mottu_CSharp_API.postman_collection' na aba "Raw text", clique em "Continue" e depois em "Import".
+* Uma nova coleção chamada "Mottu C# API - Pátio" aparecerá no Postman.
+* IMPORTANTE: Você precisará configurar a variável de coleção baseUrl.
+    * Clique na coleção "Mottu C# API - Pátio".
+    * Vá na aba "Variables".
+    * Edite a variável baseUrl e no campo "CURRENT VALUE" coloque: http://localhost:8080 (ou a porta que a API C# estiver usando localmente).
 
 
 **Simulação IoT**
