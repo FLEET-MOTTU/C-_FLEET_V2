@@ -60,7 +60,11 @@ cd Csharp.Api
  
  **3. Construa as Imagens e Inicie os Containers:**
     * No seu terminal, na pasta raiz do projeto, execute o comando:
+
+        ```sh
         docker compose up --build
+        ```
+
     * **Aplicação de Migrations:** Ao iniciar pela primeira vez (ou se houver novas migrations commitadas no repositório que ainda não foram aplicadas ao seu banco), a API tentará aplicar automaticamente as migrations pendentes no banco de dados Oracle. Acompanhe os logs do container da API para verificar.
     * Após a inicialização, a API estará acessível em `http://localhost:8080`.
 
@@ -74,7 +78,11 @@ Caso hajam alterações no modelo de dados C# (Entidades ou `AppDbContext`) que 
 
 **1. Crie uma Nova Migration:**
     * No seu terminal, na pasta raiz do projeto (onde está o `docker-compose.yml`), rode:
+
+        ```sh       
         docker-compose run --rm ef-tools sh -c "dotnet restore && dotnet ef migrations add NomeDescritivoParaSuaMudanca --verbose"
+        ```
+
     * Substitua `NomeDescritivoParaSuaMudanca` por um nome que descreva a alteração.
     * Novos arquivos de migration serão gerados na pasta `Csharp.Api/Migrations/`.
 
