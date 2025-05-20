@@ -91,6 +91,7 @@ A documentação completa e interativa de todos os endpoints, incluindo schemas 
 ## Testando a API
 
 **CRUD de motos**
+
 Os endpoits relacionados ao CRUD de motos podem ser testados através do Swagger ou via ferramentas de teste de API, como o Postman (seguem instruções para teste via Postman):
 * Copie todo o conteúdo co arquivo JSON 'Mottu_CSharp_API.postman_collection' localizado na raiz do projeto
 * Abra o Postman.
@@ -103,6 +104,7 @@ Os endpoits relacionados ao CRUD de motos podem ser testados através do Swagger
 
 
 **Simulação IoT**
+
 Para testar a funcionalidade de rastreamento e atualização de status baseada em eventos de IoT (como detecção de tags por beacons), esta API C# espera receber eventos em seu endpoint `/api/iot-events/tag-interaction`.
 Um **simulador Python/FastAPI dedicado** foi desenvolvido para gerar e enviar esses eventos. Para instruções detalhadas sobre como configurar, rodar e usar o simulador Python, por favor, consulte o README no seguinte repositório: https://github.com/FLEET-MOTTU/PY-SIM
 
