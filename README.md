@@ -49,12 +49,8 @@ Para rodar esta aplicação localmente usando Docker, você precisará de:
 ## Configuração do Ambiente Local e Inicialização
 
 **1. Clonar o Repositório:**
-
-    ```bash
-    git clone https://github.com/FLEET-MOTTU/C--POC
     ```
-
-    ```bash
+    git clone https://github.com/FLEET-MOTTU/C--POC
     cd Csharp.Api
     ```
 
