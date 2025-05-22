@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS ef-tools-env
 
-RUN dotnet tool install --global dotnet-ef --version 8.0.0 # Usando versão compatível com EF Core 8
+RUN dotnet tool install --global dotnet-ef --version 8.0.0
 
 ENV PATH="/root/.dotnet/tools:${PATH}"
 

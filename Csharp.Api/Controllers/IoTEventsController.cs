@@ -52,10 +52,6 @@ namespace Csharp.Api.Controllers
         [HttpPost("tag-interaction")]
         [ProducesResponseType(typeof(object), StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [HttpPost("tag-interaction")]
-        [ProducesResponseType(StatusCodes.Status202Accepted)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PostTagInteraction([FromBody] TagInteractionEventDto eventoDto)
         {
             if (!ModelState.IsValid)
