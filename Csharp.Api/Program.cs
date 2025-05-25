@@ -71,18 +71,14 @@ app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 }
 
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Mottu Fleet API C# V1");
-    }); 
-}
-else
-{
-    app.UseHsts();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Mottu Challenge V1");
+    c.RoutePrefix = "swagger";
+});
+
 
 // app.UseAuthentication();
 // app.UseAuthorization();
