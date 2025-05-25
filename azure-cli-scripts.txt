@@ -1,0 +1,49 @@
+1 - Criação do Grupo de Recursos:
+
+az group create -l eastus -n rg-vm-challenge
+
+
+2 - Criação da Máquina Virtual:
+
+az vm create --resource-group rg-vm-challenge \
+             --name vm-challenge \
+             --image Canonical:ubuntu-24_04-lts:minimal:24.04.202505020 \
+             --size Standard_B2s \
+             --admin-username admin_fiap \
+             --admin-password "admin_fiap@123"
+
+
+3 - Obtenção de IP publico da VM:
+
+az vm show --resource-group rg-vm-challenge \
+        --name vm-challenge \
+        --show-details \
+        --query publicIps \
+        --output tsv
+
+4 - Criação das Regras do Network Security Group (NSG) para as portas necessárias:
+
+# Para a porta da API (8080)
+az network nsg rule create --resource-group rg-vm-challenge \
+                           --nsg-name vm-challengeNSG \
+                           --name rule_port_8080 \
+                           --protocol tcp \
+                           --priority 1010 \
+                           --destination-port-range 8080 \
+                           --access Allow \
+                           --direction Inbound
+
+# Para a porta 80 (HTTP)
+az network nsg rule create --resource-group rg-vm-challenge \
+                           --nsg-name vm-challengeNSG \
+                           --name rule_port_80 \
+                           --protocol tcp \
+                           --priority 1020 \
+                           --destination-port-range 80 \
+                           --access Allow \
+                           --direction Inbound
+
+
+5 - Exclusão do Grupo de Recursos (para limpeza):
+
+az group delete --name rg-vm-challenge --yes
