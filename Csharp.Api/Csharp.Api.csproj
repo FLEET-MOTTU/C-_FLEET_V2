@@ -7,6 +7,7 @@
     <RootNamespace>Csharp.Api</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+    <UserSecretsId>13a72822-c312-451b-8bfb-bf08c05916e6</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

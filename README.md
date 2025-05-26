@@ -45,6 +45,11 @@ Para rodar esta aplicação localmente usando Docker, você precisará de:
 2.  **Docker Compose**
 3.  Acesso a uma instância do **Oracle Database** e as respectivas credenciais (usuário, senha, data source string).
 
+Para rodar sem usar o Docker, execute na pasta raiz do projeto:
+1. cd Csharp.Api
+2. dotnet user-secrets init
+3. dotnet user-secrets set "ConnectionStrings:OracleConnection" "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle.fiap.com.br)(PORT=1521)))(CONNECT_DATA=(SID=ORCL)));User ID=SEU_ID_ORACLE;Password=SUA_SENHA_ORACLE"
+4. dotnet run
 
 ## Configuração do Ambiente Local e Inicialização
 
