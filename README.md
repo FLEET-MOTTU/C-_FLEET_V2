@@ -148,3 +148,8 @@ Basicamente, você precisará:
 1.  Rodar o simulador Python em um container Docker.
 2.  Configurar o simulador para apontar para esta API C# (que estará rodando em `http://localhost:8080`).
 3.  Usar o endpoint do simulador Python para enviar eventos de "interação de tag", que serão processados por esta API C#.
+
+## Integrantes
+AMANDA MESQUITA CIRINO DA SILVA - RM 559177
+BEATRIZ FERREIRA CRUZ - RM555698
+JOURNEY TIAGO LOPES – RM 556071

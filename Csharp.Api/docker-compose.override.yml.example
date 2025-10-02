@@ -1,3 +1,6 @@
+# Renomei este arquivo para: docker-compose.override.yml
+# Substitua SEU_ID_ORACLE e SUA_SENHA_ORACLE por suas credenciais de acesso ao banco de dados Oracle
+
 services:
   mottu-csharp-api:
     environment:
