@@ -1,9 +1,11 @@
-using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using Csharp.Api.Data;
 using Csharp.Api.DTOs;
 using Csharp.Api.Entities;
 using Csharp.Api.Entities.Enums;
 using Csharp.Api.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Csharp.Api.Services
 {
@@ -11,66 +13,70 @@ namespace Csharp.Api.Services
     {
         private readonly AppDbContext _context;
         private readonly ILogger<MotoService> _logger;
+        private readonly IMapper _mapper;
 
-        public MotoService(AppDbContext context, ILogger<MotoService> logger)
+        public MotoService(AppDbContext context, ILogger<MotoService> logger, IMapper mapper)
         {
             _context = context;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<MotoViewDto> CreateMotoAsync(CreateMotoDto createMotoDto)
         {
             _logger.LogInformation("Tentativa de criar nova moto com placa {Placa} e tag {Tag}",
                 createMotoDto.Placa ?? "N/A", createMotoDto.CodigoUnicoTagParaNovaTag);
-                
-            // Regra de Negócio: Verificar se CodigoUnicoTag já existe
-            var tagExistente = await _context.TagsBle
-                                 .FirstOrDefaultAsync(t => t.CodigoUnicoTag == createMotoDto.CodigoUnicoTagParaNovaTag);
-            if (tagExistente != null)
+
+            var existingTag = await _context.TagsBle.FirstOrDefaultAsync(t => t.CodigoUnicoTag.ToUpper() == createMotoDto.CodigoUnicoTagParaNovaTag.ToUpper());
+            if (existingTag != null)
             {
                 throw new TagJaExisteException(createMotoDto.CodigoUnicoTagParaNovaTag);
             }
 
-            // Regra de Negócio: Verificar se Placa já existe
-            if (!string.IsNullOrWhiteSpace(createMotoDto.Placa))
+            if (!string.IsNullOrEmpty(createMotoDto.Placa))
             {
                 var placaNormalizada = createMotoDto.Placa.ToUpper();
-                var motoComPlacaExistente = await _context.Motos
-                                                        .FirstOrDefaultAsync(m => m.Placa == placaNormalizada);
+                var motoComPlacaExistente = await _context.Motos.FirstOrDefaultAsync(m => m.Placa == placaNormalizada);
                 if (motoComPlacaExistente != null)
                 {
                     throw new PlacaJaExisteException(createMotoDto.Placa);
                 }
             }
 
-            var novaTag = new TagBle
+            try
             {
-                Id = Guid.NewGuid(),
-                CodigoUnicoTag = createMotoDto.CodigoUnicoTagParaNovaTag,
-                NivelBateria = 100,
-            };
+                var newTag = _mapper.Map<TagBle>(createMotoDto);
+                newTag.Id = Guid.NewGuid();
+                newTag.NivelBateria = 100;
+                _context.TagsBle.Add(newTag);
 
-            var novaMoto = new Moto
+                var moto = _mapper.Map<Moto>(createMotoDto);
+                moto.Id = Guid.NewGuid();
+                moto.TagBleId = newTag.Id;
+                moto.DataCriacaoRegistro = DateTime.UtcNow;
+
+                _context.Motos.Add(moto);
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Moto com ID {MotoId} criada com sucesso.", moto.Id);
+
+                return _mapper.Map<MotoViewDto>(moto);
+            }
+            catch (DbUpdateException ex)
             {
-                Id = Guid.NewGuid(),
-                Placa = string.IsNullOrWhiteSpace(createMotoDto.Placa) ? null : createMotoDto.Placa.ToUpper(),Modelo = createMotoDto.Modelo,
-                StatusMoto = createMotoDto.StatusMoto,
-                DataCriacaoRegistro = DateTime.UtcNow,
-                DataRecolhimento = createMotoDto.DataRecolhimento ?? DateTime.UtcNow,            
-                FuncionarioRecolhimentoId = createMotoDto.FuncionarioRecolhimentoId,
-                TagBleId = novaTag.Id,
-                Tag = novaTag
-            };
-            _context.Motos.Add(novaMoto);
-            await _context.SaveChangesAsync();
-            _logger.LogInformation("Moto com ID {MotoId} criada com sucesso.", novaMoto.Id);
-            return MapMotoToViewDto(novaMoto);
+                _logger.LogError(ex, "Erro de banco de dados ao criar nova moto.");
+                throw new ConcorrenciaException("Erro ao criar moto. Dados de placa ou tag já existem.");
+            }
         }
-
-
-        public async Task<IEnumerable<MotoViewDto>> GetAllMotosAsync(string? status, string? placa)
+        
+        public async Task<PaginatedResponseDto<MotoViewDto>> GetAllMotosAsync(string? status, string? placa, int page, int pageSize)
         {
-            _logger.LogInformation("Buscando todas as motos. Filtro Status: {Status}, Filtro Placa: {Placa}", status, placa);
+            _logger.LogInformation("Buscando motos com paginação. Página: {Page}, Tamanho: {PageSize}", page, pageSize);
+            
+            if (page < 1 || pageSize < 1)
+            {
+                throw new EntradaInvalidaException("Os parâmetros 'page' e 'pageSize' devem ser maiores que zero.");
+            }
+
             var query = _context.Motos.Include(m => m.Tag).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(status))
@@ -81,9 +87,7 @@ namespace Csharp.Api.Services
                 }
                 else
                 {
-                    _logger.LogWarning("Status inválido fornecido para filtro: {Status}", status);
                     throw new EntradaInvalidaException(nameof(status), $"O valor '{status}' não é um status de moto válido.");
-
                 }
             }
 
@@ -92,46 +96,59 @@ namespace Csharp.Api.Services
                 query = query.Where(m => m.Placa != null && m.Placa.Contains(placa.ToUpper()));
             }
 
-            var motos = await query.ToListAsync();
-            return motos.Select(MapMotoToViewDto);
-        }
+            var totalItems = await query.CountAsync();
+            
+            var motos = await query
+                .OrderBy(m => m.DataCriacaoRegistro)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
+            var motoDtos = _mapper.Map<IEnumerable<MotoViewDto>>(motos).ToList();
+
+            foreach (var motoDto in motoDtos)
+            {
+                motoDto.Links.Add(new LinkDto($"api/motos/{motoDto.Id}", "self", "GET"));
+                motoDto.Links.Add(new LinkDto($"api/motos/{motoDto.Id}", "update_moto", "PUT"));
+                motoDto.Links.Add(new LinkDto($"api/motos/{motoDto.Id}", "delete_moto", "DELETE"));
+            }
+
+            return new PaginatedResponseDto<MotoViewDto>
+            {
+                TotalItems = totalItems,
+                PageNumber = page,
+                PageSize = pageSize,
+                Items = motoDtos
+            };
+        }
 
         public async Task<MotoViewDto?> GetMotoByIdAsync(Guid id)
         {
             _logger.LogInformation("Buscando moto com ID: {MotoId}", id);
-            var moto = await _context.Motos
-                                     .Include(m => m.Tag)
-                                     .FirstOrDefaultAsync(m => m.Id == id);
-
+            var moto = await _context.Motos.Include(m => m.Tag).FirstOrDefaultAsync(m => m.Id == id);
+            
             if (moto == null)
             {
                 throw new MotoNotFoundException(id);
             }
-            return MapMotoToViewDto(moto);
+            return _mapper.Map<MotoViewDto>(moto);
         }
-
 
         public async Task<MotoViewDto?> GetMotoByPlacaAsync(string placa)
         {
             _logger.LogInformation("Buscando moto com Placa: {Placa}", placa);
-
             if (string.IsNullOrWhiteSpace(placa))
             {
                 throw new EntradaInvalidaException(nameof(placa), "A placa não pode ser nula ou vazia para busca.");
             }
-
-            var moto = await _context.Motos
-                                     .Include(m => m.Tag)
-                                     .FirstOrDefaultAsync(m => m.Placa == placa.ToUpper());
-
+            var moto = await _context.Motos.Include(m => m.Tag).FirstOrDefaultAsync(m => m.Placa != null && m.Placa.ToUpper() == placa.ToUpper());
+            
             if (moto == null)
             {
                 throw new MotoNotFoundException(placa);
             }
-            return MapMotoToViewDto(moto);
+            return _mapper.Map<MotoViewDto>(moto);
         }
-
 
         public async Task<MotoViewDto> UpdateMotoAsync(Guid id, UpdateMotoDto updateMotoDto)
         {
@@ -143,44 +160,35 @@ namespace Csharp.Api.Services
                 throw new MotoNotFoundException(id);
             }
 
-            // Regra de Negócio: Placa obrigatória se StatusMoto não for "SemPlacaEmColeta"
             if (updateMotoDto.StatusMoto != TipoStatusMoto.SemPlacaEmColeta && string.IsNullOrWhiteSpace(updateMotoDto.Placa))
             {
                 throw new EntradaInvalidaException(nameof(updateMotoDto.Placa), "A placa é obrigatória para o status da moto selecionado.");
             }
 
-            // Regra de Negócio: Se a placa mudou, verificar se a nova placa já existe em outra moto
             var novaPlacaUpper = string.IsNullOrWhiteSpace(updateMotoDto.Placa) ? null : updateMotoDto.Placa.ToUpper();
-           if (novaPlacaUpper != motoExistente.Placa &&
-                !string.IsNullOrWhiteSpace(novaPlacaUpper))
+            if (novaPlacaUpper != motoExistente.Placa && !string.IsNullOrWhiteSpace(novaPlacaUpper))
             {
-                var outraMotoComMesmaPlaca = await _context.Motos
-                                            .FirstOrDefaultAsync(m => m.Id != id && m.Placa == novaPlacaUpper);
+                var outraMotoComMesmaPlaca = await _context.Motos.FirstOrDefaultAsync(m => m.Id != id && m.Placa == novaPlacaUpper);
                 if (outraMotoComMesmaPlaca != null)
                 {
-                    _logger.LogWarning("Tentativa de atualizar moto ID {MotoId} para placa '{NovaPlaca}' que já está registrada em outra moto ID {OutraMotoId}.", 
-                        id, novaPlacaUpper, outraMotoComMesmaPlaca.Id);
                     throw new PlacaJaExisteException(updateMotoDto.Placa!);
                 }
             }
 
-            motoExistente.Placa = novaPlacaUpper;
-            motoExistente.Modelo = updateMotoDto.Modelo;
-            motoExistente.StatusMoto = updateMotoDto.StatusMoto;
-  
+            _mapper.Map(updateMotoDto, motoExistente);
+            
             try
             {
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("Moto com ID {MotoId} atualizada com sucesso.", id);
-                return MapMotoToViewDto(motoExistente);
+                return _mapper.Map<MotoViewDto>(motoExistente);
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                _logger.LogError(ex, "Erro ao tentar atualizar moto ID {MotoId}.", id);
-                throw; 
+                _logger.LogError(ex, "Erro de concorrência ao tentar atualizar moto ID {MotoId}.", id);
+                throw new ConcorrenciaException("Os dados foram modificados por outra transação. Por favor, tente novamente.");
             }
         }
-
 
         public async Task<bool> DeleteMotoAsync(Guid id)
         {
@@ -191,41 +199,16 @@ namespace Csharp.Api.Services
             {
                 throw new MotoNotFoundException(id);
             }
- 
+            
+            _context.Motos.Remove(motoParaDeletar);
             if (motoParaDeletar.Tag != null)
             {
                 _context.TagsBle.Remove(motoParaDeletar.Tag);
             }
-            _context.Motos.Remove(motoParaDeletar);
 
             await _context.SaveChangesAsync();
-            _logger.LogInformation("Moto com ID {MotoId} deletada com sucesso.", id);
+            _logger.LogInformation("Moto com ID {MotoId} e Tag associada deletadas com sucesso.", id);
             return true;
         }
-
-
-        private MotoViewDto MapMotoToViewDto(Moto moto)
-        {
-            return new MotoViewDto
-            {
-                Id = moto.Id,
-                Placa = moto.Placa,
-                Modelo = moto.Modelo.ToString(),
-                StatusMoto = moto.StatusMoto.ToString(),
-                DataCriacaoRegistro = moto.DataCriacaoRegistro,
-                DataRecolhimento = moto.DataRecolhimento,
-                FuncionarioRecolhimentoId = moto.FuncionarioRecolhimentoId,
-                DataEntradaPatio = moto.DataEntradaPatio,
-                UltimoBeaconConhecidoId = moto.UltimoBeaconConhecidoId,
-                UltimaVezVistoEmPatio = moto.UltimaVezVistoEmPatio,
-                Tag = moto.Tag == null ? null : new TagBleViewDto
-                {
-                    Id = moto.Tag.Id,
-                    CodigoUnicoTag = moto.Tag.CodigoUnicoTag,
-                    NivelBateria = moto.Tag.NivelBateria
-                }
-            };
-        }
-
     }
 }

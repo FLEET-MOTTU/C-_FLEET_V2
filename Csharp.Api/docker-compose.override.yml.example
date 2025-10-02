@@ -1,0 +1,7 @@
+services:
+  mottu-csharp-api:
+    environment:
+      - ConnectionStrings__OracleConnection=Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle.fiap.com.br)(PORT=1521)))(CONNECT_DATA=(SID=ORCL)));User ID=SEU_ID_ORACLE;Password=SUA_SENHA_ORACLE
+  ef-tools:
+    environment:
+      - ConnectionStrings__OracleConnection=Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle.fiap.com.br)(PORT=1521)))(CONNECT_DATA=(SID=ORCL)));User ID=SEU_ID_ORACLE;Password=SUA_SENHA_ORACLE

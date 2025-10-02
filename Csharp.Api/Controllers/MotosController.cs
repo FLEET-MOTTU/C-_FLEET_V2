@@ -9,9 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Csharp.Api.Controllers
 {
-    /// <summary>
-    /// Gerencia as operações CRUD para as motos.
-    /// </summary>
+
     [ApiController]
     [Route("api/motos")]
     public class MotosController : ControllerBase
@@ -39,7 +37,6 @@ namespace Csharp.Api.Controllers
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateMoto([FromBody] CreateMotoDto createMotoDto)
         {
             if (!ModelState.IsValid)
@@ -52,20 +49,21 @@ namespace Csharp.Api.Controllers
         }
 
         /// <summary>
-        /// Lista todas as motos cadastradas, com opção de filtros.
+        /// Lista todas as motos cadastradas, com suporte a paginação e filtros.
         /// </summary>
         /// <param name="status">Filtra motos por um status específico (ex: "ProntaParaAluguel"). Case-insensitive.</param>
         /// <param name="placa">Filtra motos por parte da placa (busca parcial, case-insensitive).</param>
-        /// <returns>Uma lista de motos.</returns>
-        /// <response code="200">Retorna a lista de motos (pode ser vazia).</response>
-        /// <response code="400">Se o parâmetro de filtro 'status' for inválido.</response>
+        /// <param name="page">Número da página a ser retornada. Valor padrão é 1.</param>
+        /// <param name="pageSize">Número de itens por página. Valor padrão é 10.</param>
+        /// <returns>Uma lista paginada de motos.</returns>
+        /// <response code="200">Retorna a lista paginada de motos (pode ser vazia).</response>
+        /// <response code="400">Se os parâmetros de filtro ou paginação forem inválidos.</response>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<MotoViewDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PaginatedResponseDto<MotoViewDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllMotos([FromQuery] string? status, [FromQuery] string? placa)
+        public async Task<IActionResult> GetAllMotos([FromQuery] string? status, [FromQuery] string? placa, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var motos = await _motoService.GetAllMotosAsync(status, placa);
+            var motos = await _motoService.GetAllMotosAsync(status, placa, page, pageSize);
             return Ok(motos);
         }
 
@@ -79,7 +77,6 @@ namespace Csharp.Api.Controllers
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetMotoById(Guid id)
         {
             var moto = await _motoService.GetMotoByIdAsync(id);
@@ -98,7 +95,6 @@ namespace Csharp.Api.Controllers
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetMotoByPlaca(string placa)
         {
             var moto = await _motoService.GetMotoByPlacaAsync(placa);
@@ -112,15 +108,14 @@ namespace Csharp.Api.Controllers
         /// <param name="updateMotoDto">Objeto contendo os dados da moto para atualização (Placa, Modelo, StatusMoto).</param>
         /// <returns>Retorna o objeto da moto atualizada.</returns>
         /// <response code="200">Retorna a moto atualizada.</response>
-        /// <response code="400">Se os dados fornecidos forem inválidos (ex: campos obrigatórios faltando, placa condicionalmente obrigatória não fornecida).</response>
+        /// <response code="400">Se os dados fornecidos forem inválidos.</response>
         /// <response code="404">Se a moto com o ID especificado não for encontrada.</response>
-        /// <response code="409">Se a nova placa já existir em outra moto, ou se houver um conflito de concorrência.</response>
+        /// <response code="409">Se a nova placa já existir em outra moto ou houver um erro de concorrência.</response>
         [HttpPut("{id:guid}")]
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateMoto(Guid id, [FromBody] UpdateMotoDto updateMotoDto)
         {
             if (!ModelState.IsValid)
@@ -145,7 +140,6 @@ namespace Csharp.Api.Controllers
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteMoto(Guid id)
         {
             await _motoService.DeleteMotoAsync(id);

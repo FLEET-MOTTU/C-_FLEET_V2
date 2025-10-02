@@ -44,7 +44,7 @@ namespace Csharp.Api.Middleware
             var response = context.Response;
 
             object? errorDetails = null;
-            string errorMessage = "Ocorreu um erro inesperado, boa sorte.";
+            string errorMessage = "Ocorreu um erro inesperado.";
 
             if (_env.IsDevelopment())
             {
@@ -53,29 +53,27 @@ namespace Csharp.Api.Middleware
 
             switch (exception)
             {
-                case MotoNotFoundException mnfEx:
+                case MotoNotFoundException:
+                case BeaconNotFoundException:
                     response.StatusCode = (int)HttpStatusCode.NotFound; // 404
-                    errorMessage = mnfEx.Message;
+                    errorMessage = exception.Message;
                     break;
-
                 case PlacaJaExisteException:
                 case TagJaExisteException:
+                case BeaconJaExisteException:
+                case ConcorrenciaException:
                     response.StatusCode = (int)HttpStatusCode.Conflict; // 409
                     errorMessage = exception.Message;
                     break;
-
-                case EntradaInvalidaException eiEx:
+                case EntradaInvalidaException:
+                case BusinessRuleException:
                     response.StatusCode = (int)HttpStatusCode.BadRequest; // 400
-                    errorMessage = eiEx.Message;
-                    break;
-                case BusinessRuleException brEx:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest; // 400
-                    errorMessage = brEx.Message;
+                    errorMessage = exception.Message;
                     break;
                 case DbUpdateConcurrencyException dbConcurrencyEx:
                     response.StatusCode = (int)HttpStatusCode.Conflict; // 409
                     errorMessage = "Os dados foram modificados por outra transação. Por favor, tente novamente.";
-                    _logger.LogWarning(dbConcurrencyEx, "Conflito");
+                    _logger.LogWarning(dbConcurrencyEx, "Conflito de concorrência detectado.");
                     break;
                 default:
                     response.StatusCode = (int)HttpStatusCode.InternalServerError; // 500

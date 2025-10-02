@@ -3,21 +3,25 @@
 
 ## Descrição do Projeto
 
-Esta API RESTful, trata-se de um Proof of Concept desenvolvida em C# com ASP.NET Core 8 e Entity Framework Core, é um componente do sistema de gerenciamento de pátios da empresa Mottu. Seu objetivo principal é gerenciar o cadastro e o estado das motocicletas, além de processar eventos de IoT simulados para rastreamento dentro dos pátios.
+Esta API RESTful é um componente do sistema de gerenciamento de pátios da empresa Mottu. Desenvolvida em C# com ASP.NET Core 8 e Entity Framework Core, seu objetivo principal é gerenciar o cadastro, o estado e o rastreamento de motocicletas dentro dos pátios.
 
-A API implementa um CRUD completo para a entidade `Moto` (incluindo sua `TagBle`(Tag Bluetooth Low Energy) associada) e está preparada para receber interações de tags BLE via um endpoint dedicado, que será alimentado por um simulador Python de eventos IoT. A persistência dos dados é feita em um banco de dados Oracle.
+
+A API agora implementa um **CRUD completo** para as entidades `Moto` (junto de sua `TagBle` associada) e `Beacon`. Ela está preparada para processar eventos de IoT simulados para rastreamento de motos via um endpoint dedicado, que será alimentado por um simulador Python. A persistência dos dados é feita em um banco de dados Oracle.
 
 **Principais Funcionalidades**
-* CRUD completo para Motos e suas Tags BLE associadas.
-* Validação de dados de entrada e regras de negócio.
+* **CRUD completo para Motos e suas Tags BLE associadas.**
+* **CRUD completo para Beacons**, que são os pontos de rastreamento do pátio.
+* **Paginação e HATEOAS** (Hypermedia as an Engine of Application State) nos endpoints de listagem, seguindo as melhores práticas REST.
+* Validação de dados de entrada e regras de negócio robustas.
 * Geração e aplicação de migrations do banco de dados via EF Core.
-* Documentação da API com Swagger.
-* Endpoint para recebimento de eventos simulados de IoT (interação de tag).
+* Documentação da API com Swagger, incluindo exemplos de payloads.
+* Endpoint para recebimento de eventos simulados de IoT.
 
 **Tecnologias Utilizadas:**
 * C# e ASP.NET Core 8
-* Entity Framework Core 8
-* Oracle Database (conectado via EF Core)
+* Entity Framework Core 8 e Oracle Database
+* **AutoMapper** para mapeamento de DTOs e entidades
+* **Swashbuckle.AspNetCore.Filters** para exemplos no Swagger
 * Docker e Docker Compose para ambiente de desenvolvimento e deploy
 * Swagger (Swashbuckle) para documentação da API
 * Princípios SOLID e Clean Architecture
@@ -25,31 +29,32 @@ A API implementa um CRUD completo para a entidade `Moto` (incluindo sua `TagBle`
 
 ## Estrutura do Projeto (Visão Geral)
 
-* **`Controllers/`**: Contém os API Controllers que lidam com as requisições HTTP e respostas.
+* **`Controllers/`**: Contém os API Controllers para `Motos`, `Beacons` e `IoTEvents`.
 * **`Services/`**: Contém a lógica de negócio e orquestração das operações.
-* **`DTOs/`**: Define os objetos usados para transferir dados entre o cliente e a API, e para validação.
+* **`DTOs/`**: Define os objetos de transferência de dados.
     * **`ValidationAttributes/`**: Contém atributos de validação customizados.
-* **`Entities/`**: Contém as classes que representam as tabelas do banco de dados (modelos de domínio para EF Core).
+* **`Entities/`**: Contém as classes que representam as tabelas do banco de dados.
     * **`Enums/`**: Contém as enumerações usadas pelas entidades e DTOs.
+* **`Profiles/`**: **[NOVO]** Contém os perfis de mapeamento do AutoMapper.
+* **`SwaggerExamples/`**: **[NOVO]** Contém as classes que fornecem exemplos de payloads para o Swagger.
 * **`Data/`**: Contém a classe `AppDbContext` do Entity Framework Core.
 * **`Exceptions/`**: Contém as classes de exceção personalizadas.
 * **`Middleware/`**: Contém middlewares customizados, como o `GlobalExceptionHandlerMiddleware`.
 * **`Migrations/`**: Contém os arquivos de migration gerados pelo EF Core.
 
-
 ## Pré-requisitos
 
 Para rodar esta aplicação localmente usando Docker, você precisará de:
 
-1.  **Docker Desktop**
-2.  **Docker Compose**
-3.  Acesso a uma instância do **Oracle Database** e as respectivas credenciais (usuário, senha, data source string).
+1. **Docker Desktop**
+2. **Docker Compose**
+3. Acesso a uma instância do **Oracle Database** e as respectivas credenciais.
 
 Para rodar sem usar o Docker, execute na pasta raiz do projeto:
-1. cd Csharp.Api
-2. dotnet user-secrets init
-3. dotnet user-secrets set "ConnectionStrings:OracleConnection" "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle.fiap.com.br)(PORT=1521)))(CONNECT_DATA=(SID=ORCL)));User ID=SEU_ID_ORACLE;Password=SUA_SENHA_ORACLE"
-4. dotnet run
+1. `cd Csharp.Api`
+2. `dotnet user-secrets init`
+3. `dotnet user-secrets set "ConnectionStrings:OracleConnection" "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle.fiap.com.br)(PORT=1521)))(CONNECT_DATA=(SID=ORCL)));User ID=SEU_ID_ORACLE;Password=SUA_SENHA_ORACLE"`
+4. `dotnet run`
 
 ## Configuração do Ambiente Local e Inicialização
 
@@ -106,9 +111,10 @@ A documentação completa e interativa de todos os endpoints, incluindo schemas 
 
 ## Testando a API
 
-**CRUD de motos**
+**CRUD de Motos, Beacons e simulação IoT**
 
-Os endpoits relacionados ao CRUD de motos podem ser testados através do Swagger ou via ferramentas de teste de API, como o Postman (seguem instruções para teste via Postman):
+A forma mais fácil de testar a API é importando a coleção de testes do Postman que já está preparada na riaz do projeto. Essa coleção inclui cenários de sucesso e falha para todos os endpoints de Motos e Beacons, além de um teste de simulação de evento IoT para que o teste não seja mais dependente da API de python.
+
 * Copie todo o conteúdo co arquivo JSON 'Mottu_CSharp_API.postman_collection' localizado na raiz do projeto
 * Abra o Postman.
 * Cole o contúdo do JSON 'Mottu_CSharp_API.postman_collection' na aba "Raw text", clique em "Continue" e depois em "Import".
@@ -117,9 +123,11 @@ Os endpoits relacionados ao CRUD de motos podem ser testados através do Swagger
     * Clique na coleção "Mottu C# API - Pátio".
     * Vá na aba "Variables".
     * Edite a variável baseUrl e no campo "CURRENT VALUE" coloque: http://localhost:8080 (ou a porta que a API C# estiver usando localmente).
+* As requisições de criação (1. Create New Moto e 1. Create New Beacon) usam dados dinâmicos para evitar conflitos e preenchem as variáveis da coleção (motoId, beaconId, etc.).
+* É crucial executar os requests em ordem para que os testes de GET, PUT e DELETE funcionem, pois eles dependem dos IDs criados nos primeiros requests.
 
 
-**Simulação IoT**
+**Simulação IoT (Obsoleto mas legal de saber, o script de testes na raiz já simula automaticamente no postman)**
 
 Para testar a funcionalidade de rastreamento e atualização de status baseada em eventos de IoT (como detecção de tags por beacons), esta API C# espera receber eventos em seu endpoint `/api/iot-events/tag-interaction`.
 Um **simulador Python/FastAPI dedicado** foi desenvolvido para gerar e enviar esses eventos. Para instruções detalhadas sobre como configurar, rodar e usar o simulador Python, por favor, consulte o README no seguinte repositório: https://github.com/FLEET-MOTTU/PY-SIM

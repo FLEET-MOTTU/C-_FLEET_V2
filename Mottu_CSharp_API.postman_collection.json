@@ -1,42 +1,46 @@
 {
-    "info": {
-        "_postman_id": "YOUR_UNIQUE_COLLECTION_ID_HERE",
-        "name": "Mottu C# API - Pátio",
-        "description": "Coleção de testes para a API C# de gerenciamento de frota e pátios da Mottu.",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-    },
-    "item": [
-        {
-            "name": "Motos CRUD",
-            "description": "Endpoints para gerenciar Motos",
-            "item": [
-                {
-                    "name": "1. Create New Moto",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "pm.test(\"Status code is 201 Created\", function () {",
-                                    "    pm.response.to.have.status(201);",
-                                    "});",
-                                    "pm.test(\"Response has Location header\", function () {",
-                                    "    pm.response.to.have.header(\"Location\");",
-                                    "});",
-                                    "var jsonData = pm.response.json();",
-                                    "if (jsonData && jsonData.id) {",
-                                    "    pm.collectionVariables.set(\"motoId\", jsonData.id);",
-                                    "    console.log(\"Set motoId to: \" + jsonData.id);",
-                                    "}",
-                                    "if (jsonData && jsonData.placa) {",
-                                    "    pm.collectionVariables.set(\"placaMotoCriada\", jsonData.placa);",
-                                    "    console.log(\"Set placaMotoCriada to: \" + jsonData.placa);",
-                                    "}"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
+	"info": {
+		"_postman_id": "YOUR_UNIQUE_COLLECTION_ID_HERE",
+		"name": "Mottu C# API - Pátio",
+		"description": "Coleção de testes para a API C# de gerenciamento de frota e pátios da Mottu. Versão completa com CRUD de Motos, Beacons, e simulação de IoT.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Motos CRUD",
+			"description": "Endpoints para gerenciar Motos",
+			"item": [
+				{
+					"name": "1. Create New Moto (Success)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test(\"Response has Location header\", function () {",
+									"    pm.response.to.have.header(\"Location\");",
+									"});",
+									"var jsonData = pm.response.json();",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set(\"motoId\", jsonData.id);",
+									"    console.log(\"Set motoId to: \" + jsonData.id);",
+									"}",
+									"if (jsonData && jsonData.placa) {",
+									"    pm.collectionVariables.set(\"placaMotoCriada\", jsonData.placa);",
+									"    console.log(\"Set placaMotoCriada to: \" + jsonData.placa);",
+									"}",
+									"if (jsonData && jsonData.tag) {",
+									"    pm.collectionVariables.set(\"tagMotoCriada\", jsonData.tag.codigoUnicoTag);",
+									"    console.log(\"Set tagMotoCriada to: \" + jsonData.tag.codigoUnicoTag);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
                     "request": {
                         "method": "POST",
                         "header": [
@@ -47,7 +51,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"placa\": \"API0B01\",\n  \"modelo\": \"ModeloSport100\",\n  \"statusMoto\": \"PendenteColeta\",\n  \"codigoUnicoTagParaNovaTag\": \"TAGAPI001\",\n  \"funcionarioRecolhimentoId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"dataRecolhimento\": \"2025-05-20T14:00:00Z\"\n}",
+                            "raw": "{\n  \"placa\": \"TEST-{{$randomAlphaNumeric}}\",\n  \"modelo\": \"ModeloSport100\",\n  \"statusMoto\": \"PendenteColeta\",\n  \"codigoUnicoTagParaNovaTag\": \"TAG-{{$randomAlphaNumeric}}\",\n  \"funcionarioRecolhimentoId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"dataRecolhimento\": \"2025-05-20T14:00:00Z\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -67,193 +71,295 @@
                         "description": "Cria uma nova moto e sua tag associada. A placa é opcional apenas se statusMoto for 'SemPlacaEmColeta'."
                     },
                     "response": []
-                },
-                {
-                    "name": "2. Get All Motos",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/api/motos?status=PendenteColeta&placa=API",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "motos"
-                            ],
-                            "query": [
-                                {
-                                    "key": "status",
-                                    "value": "PendenteColeta",
-                                    "description": "(Opcional) Filtra por status da moto (ex: PendenteColeta, ProntaParaAluguel)"
-                                },
-                                {
-                                    "key": "placa",
-                                    "value": "API",
-                                    "description": "(Opcional) Filtra por parte da placa (busca parcial)"
-                                }
-                            ]
-                        },
-                        "description": "Lista todas as motos, com filtros opcionais."
-                    },
-                    "response": []
-                },
-                {
-                    "name": "3. Get Moto by ID",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "pm.test(\"Status code is 200 OK or 404 Not Found\", function () {",
-                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
-                                    "});"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/api/motos/{{motoId}}",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "motos",
-                                "{{motoId}}"
-                            ]
-                        },
-                        "description": "Obtém uma moto específica pelo seu ID. Use o ID de uma moto criada."
-                    },
-                    "response": []
-                },
-                {
-                    "name": "4. Get Moto by Placa",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/api/motos/por-placa/{{placaMotoCriada}}",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "motos",
-                                "por-placa",
-                                "{{placaMotoCriada}}"
-                            ]
-                        },
-                        "description": "Obtém uma moto específica pela placa. Use a placa de uma moto criada."
-                    },
-                    "response": []
-                },
-                {
-                    "name": "5. Update Moto",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "pm.test(\"Status code is 200 OK or error code (400, 404, 409)\", function () {",
-                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 404, 409]);",
-                                    "});"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"placa\": \"{{placaMotoCriada}}-EDT\",\n  \"modelo\": \"ModeloUrbana125\",\n  \"statusMoto\": \"ProntaParaAluguel\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": {
-                            "raw": "{{baseUrl}}/api/motos/{{motoId}}",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "motos",
-                                "{{motoId}}"
-                            ]
-                        },
-                        "description": "Atualiza uma moto existente. Use o ID de uma moto criada."
-                    },
-                    "response": []
-                },
-                {
-                    "name": "6. Delete Moto",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "pm.test(\"Status code is 204 No Content or 404 Not Found\", function () {",
-                                    "    pm.expect(pm.response.code).to.be.oneOf([204, 404]);",
-                                    "});"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "DELETE",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/api/motos/{{motoId}}",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "motos",
-                                "{{motoId}}"
-                            ]
-                        },
-                        "description": "Deleta uma moto existente. Use o ID de uma moto que você não se importa em deletar."
-                    },
-                    "response": []
-                }
-            ]
-        },
-        {
-            "name": "IoT Events",
-            "description": "Endpoints para simular eventos de IoT",
-            "item": [
-                {
-                    "name": "Simulate Tag Interaction",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "pm.test(\"Status code is 202 Accepted\", function () {",
-                                    "    pm.response.to.have.status(202);",
-                                    "});"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
+				},
+				{
+					"name": "1.b Create New Moto (Failure - Duplicate Placa)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 409 Conflict\", function () {",
+									"    pm.response.to.have.status(409);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"placa\": \"TESTE123\",\n  \"modelo\": \"ModeloSport100\",\n  \"statusMoto\": \"PendenteColeta\",\n  \"codigoUnicoTagParaNovaTag\": \"ANOTHERTAG\",\n  \"funcionarioRecolhimentoId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"dataRecolhimento\": \"2025-05-20T14:00:00Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/motos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"motos"
+							]
+						},
+						"description": "Tenta criar uma moto com uma placa que já existe (TESTE123), deve retornar 409 Conflict."
+					},
+					"response": []
+				},
+				{
+					"name": "2. Get All Motos (With Pagination & Filters)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const response = pm.response.json();",
+									"pm.test(\"Response is paginated\", function() {",
+									"    pm.expect(response).to.have.property('items');",
+									"    pm.expect(response).to.have.property('totalItems');",
+									"    pm.expect(response.items).to.be.an('array');",
+									"});",
+									"if (response.items.length > 0) {",
+									"    pm.test(\"First item has HATEOAS links\", function() {",
+									"        pm.expect(response.items[0]).to.have.property('links');",
+									"        pm.expect(response.items[0].links).to.be.an('array');",
+									"        pm.expect(response.items[0].links[0]).to.have.property('rel');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/motos?status=PendenteColeta&placa=TEST&page=1&pageSize=5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"motos"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "PendenteColeta",
+									"description": "(Opcional) Filtra por status da moto (ex: PendenteColeta, ProntaParaAluguel)"
+								},
+								{
+									"key": "placa",
+									"value": "TEST",
+									"description": "(Opcional) Filtra por parte da placa (busca parcial)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "(Opcional) Número da página para paginação."
+								},
+								{
+									"key": "pageSize",
+									"value": "5",
+									"description": "(Opcional) Tamanho da página para paginação."
+								}
+							]
+						},
+						"description": "Lista todas as motos, agora com suporte a paginação e filtros."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Get Moto by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/motos/{{motoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"motos",
+								"{{motoId}}"
+							]
+						},
+						"description": "Obtém uma moto específica pelo seu ID. Use o ID de uma moto criada."
+					},
+					"response": []
+				},
+				{
+					"name": "4. Get Moto by Placa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/motos/por-placa/{{placaMotoCriada}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"motos",
+								"por-placa",
+								"{{placaMotoCriada}}"
+							]
+						},
+						"description": "Obtém uma moto específica pela placa. Use a placa de uma moto criada."
+					},
+					"response": []
+				},
+				{
+					"name": "5. Update Moto (Success)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"placa\": \"UPDATED1\",\n  \"modelo\": \"ModeloUrbana125\",\n  \"statusMoto\": \"ProntaParaAluguel\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/motos/{{motoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"motos",
+								"{{motoId}}"
+							]
+						},
+						"description": "Atualiza uma moto existente. Use o ID de uma moto criada."
+					},
+					"response": []
+				},
+				{
+					"name": "6. Delete Moto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204 No Content\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/motos/{{motoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"motos",
+								"{{motoId}}"
+							]
+						},
+						"description": "Deleta uma moto existente. Use o ID de uma moto que você não se importa em deletar."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Beacons CRUD",
+			"description": "Endpoints para gerenciar Beacons",
+			"item": [
+				{
+					"name": "1. Create New Beacon (Success)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"const response = pm.response.json();",
+									"if (response && response.id) {",
+									"    pm.collectionVariables.set(\"beaconId\", response.id);",
+									"    pm.collectionVariables.set(\"beaconUniqueId\", response.beaconId);",
+									"    console.log(\"Set beaconId to: \" + response.id);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
                     "request": {
                         "method": "POST",
                         "header": [
@@ -264,7 +370,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"codigoUnicoTag\": \"{{tagBleCodigoUnico}}\",\n  \"beaconIdDetectado\": \"{{beaconIdExemplo}}\",\n  \"timestamp\": \"{{$isoTimestamp}}\",\n  \"nivelBateria\": 80,\n  \"tipoEvento\": \"entrada_patio\"\n}",
+                            "raw": "{\n  \"beaconId\": \"BEACON-{{$randomAlphaNumeric}}\",\n  \"ativo\": true\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -272,53 +378,339 @@
                             }
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/iot-events/tag-interaction",
+                            "raw": "{{baseUrl}}/api/beacons",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
-                                "iot-events",
-                                "tag-interaction"
+                                "beacons"
                             ]
                         },
-                        "description": "Envia um evento simulado de interação de tag (ex: detectada por beacon)."
+                        "description": "Cria um novo beacon. O ID único deve ser exclusivo."
                     },
                     "response": []
-                }
-            ]
-        }
-    ],
-    "variable": [
-        {
-            "key": "baseUrl",
-            "value": "http://localhost:8080",
-            "type": "string",
-            "description": "URL base da API C#. Altere se sua API estiver rodando em outra porta ou host."
-        },
-        {
-            "key": "motoId",
-            "value": "",
-            "type": "string",
-            "description": "Armazena o ID de uma moto criada para ser usado em outros requests. É preenchido pelo script de teste do request 'Create New Moto'."
-        },
-        {
-            "key": "placaMotoCriada",
-            "value": "",
-            "type": "string",
-            "description": "Armazena a placa de uma moto criada. É preenchido pelo script de teste do request 'Create New Moto'."
-        },
-        {
-            "key": "tagBleCodigoUnico",
-            "value": "TAG_PARA_IOT_EVENT",
-            "type": "string",
-            "description": "Código de uma tag existente para simular eventos IoT. Certifique-se que esta tag existe no banco."
-        },
-        {
-            "key": "beaconIdExemplo",
-            "value": "BEACON_ENTRADA_01",
-            "type": "string",
-            "description": "ID de um beacon exemplo para simular eventos IoT."
-        }
-    ]
+				},
+				{
+					"name": "2. Get All Beacons (With Pagination)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const response = pm.response.json();",
+									"pm.test(\"Response is paginated\", function() {",
+									"    pm.expect(response).to.have.property('items');",
+									"    pm.expect(response).to.have.property('totalItems');",
+									"    pm.expect(response.items).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/beacons?page=1&pageSize=5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"beacons"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "5"
+								}
+							]
+						},
+						"description": "Lista todos os beacons com suporte a paginação."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Get Beacon by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/beacons/{{beaconId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"beacons",
+								"{{beaconId}}"
+							]
+						},
+						"description": "Obtém um beacon específico pelo seu ID (GUID). Use o ID de um beacon criado."
+					},
+					"response": []
+				},
+				{
+					"name": "4. Get Beacon by BeaconId (Unique ID)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/beacons/by-beaconid/{{beaconUniqueId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"beacons",
+								"by-beaconid",
+								"{{beaconUniqueId}}"
+							]
+						},
+						"description": "Obtém um beacon específico pelo seu ID único de rastreamento."
+					},
+					"response": []
+				},
+				{
+					"name": "5. Update Beacon (Success)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ativo\": false,\n  \"ultimaZonaDetectada\": \"Zona Desativada\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/beacons/{{beaconId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"beacons",
+								"{{beaconId}}"
+							]
+						},
+						"description": "Atualiza os dados de um beacon existente. Use o ID de um beacon criado."
+					},
+					"response": []
+				},
+				{
+					"name": "6. Delete Beacon",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204 No Content\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/beacons/{{beaconId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"beacons",
+								"{{beaconId}}"
+							]
+						},
+						"description": "Deleta um beacon existente. Use o ID de um beacon criado."
+					},
+					"response": []
+				},
+				{
+					"name": "7. Get Deleted Beacon (Failure - Not Found)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404 Not Found\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/beacons/{{beaconId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"beacons",
+								"{{beaconId}}"
+							]
+						},
+						"description": "Tenta obter o beacon que acabou de ser deletado. Deve retornar 404 Not Found."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "IoT Events",
+			"description": "Endpoints para simular eventos de IoT",
+			"item": [
+				{
+					"name": "Simulate Tag Interaction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 202 Accepted\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codigoUnicoTag\": \"{{tagMotoCriada}}\",\n  \"beaconIdDetectado\": \"{{beaconUniqueId}}\",\n  \"timestamp\": \"{{$isoTimestamp}}\",\n  \"nivelBateria\": 80,\n  \"tipoEvento\": \"leitura_periodica\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/iot-events/tag-interaction",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"iot-events",
+								"tag-interaction"
+							]
+						},
+						"description": "Envia um evento simulado de interação de tag. Use as variáveis da moto e beacon criados."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string",
+			"description": "URL base da API C#. Altere se sua API estiver rodando em outra porta ou host."
+		},
+		{
+			"key": "motoId",
+			"value": "",
+			"type": "string",
+			"description": "Armazena o ID de uma moto criada para ser usado em outros requests. É preenchido pelo script de teste do request 'Create New Moto'."
+		},
+		{
+			"key": "placaMotoCriada",
+			"value": "",
+			"type": "string",
+			"description": "Armazena a placa de uma moto criada. É preenchido pelo script de teste do request 'Create New Moto'."
+		},
+		{
+			"key": "tagMotoCriada",
+			"value": "",
+			"type": "string",
+			"description": "Armazena o código da tag de uma moto criada para uso nos eventos IoT."
+		},
+		{
+			"key": "beaconId",
+			"value": "",
+			"type": "string",
+			"description": "Armazena o ID (GUID) de um beacon criado."
+		},
+		{
+			"key": "beaconUniqueId",
+			"value": "",
+			"type": "string",
+			"description": "Armazena o ID único (string) de um beacon criado, para testes."
+		}
+	]
 }
