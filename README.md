@@ -120,6 +120,45 @@ docker-compose run --rm ef-tools sh -c "dotnet restore && dotnet ef migrations a
 
 A documentação completa e interativa de todos os endpoints, incluindo schemas de request/response e exemplos, está disponível via Swagger UI em /swagger quando a API está rodando (ex: `http://localhost:8080/swagger`).
 
+Abaixo estão os detalhes de todos os endpoints disponíveis na API.
+
+### Endpoints de Motos (`/api/motos`)
+
+| Método | Rota | Descrição | Status de Sucesso | Erros Comuns |
+| :--- | :--- | :--- | :--- | :--- |
+| **`POST`** | `/api/motos` | Cria uma nova moto no sistema. | `201 Created` | `400 Bad Request`, `409 Conflict` |
+| **`GET`** | `/api/motos` | Lista todas as motos com suporte a paginação e filtros. | `200 OK` | `400 Bad Request` |
+| **`GET`** | `/api/motos/{id}` | Obtém os detalhes de uma moto pelo seu ID (GUID). | `200 OK` | `404 Not Found` |
+| **`GET`** | `/api/motos/por-placa/{placa}`| Obtém os detalhes de uma moto pela placa. | `200 OK` | `400 Bad Request`, `404 Not Found` |
+| **`PUT`** | `/api/motos/{id}` | Atualiza uma moto existente. | `200 OK` | `400 Bad Request`, `404 Not Found`, `409 Conflict` |
+| **`DELETE`**| `/api/motos/{id}` | Remove uma moto e sua tag associada. | `204 No Content` | `404 Not Found` |
+
+### Endpoints de Beacons (`/api/beacons`)
+
+| Método | Rota | Descrição | Status de Sucesso | Erros Comuns |
+| :--- | :--- | :--- | :--- | :--- |
+| **`POST`** | `/api/beacons` | Cria um novo beacon no sistema. | `201 Created` | `400 Bad Request`, `409 Conflict` |
+| **`GET`** | `/api/beacons` | Lista todos os beacons com suporte a paginação. | `200 OK` | `400 Bad Request` |
+| **`GET`** | `/api/beacons/{id}` | Obtém os detalhes de um beacon pelo seu ID (GUID). | `200 OK` | `404 Not Found` |
+| **`GET`** | `/api/beacons/by-beaconid/{beaconId}`| Obtém os detalhes de um beacon pelo seu ID único. | `200 OK` | `404 Not Found` |
+| **`PUT`** | `/api/beacons/{id}` | Atualiza um beacon existente. | `200 OK` | `400 Bad Request`, `404 Not Found` |
+| **`DELETE`**| `/api/beacons/{id}` | Remove um beacon do sistema. | `204 No Content` | `404 Not Found` |
+
+### Endpoints de IoT Events (`/api/iot-events`)
+
+| Método | Rota | Descrição | Status de Sucesso | Erros Comuns |
+| :--- | :--- | :--- | :--- | :--- |
+| **`POST`** | `/api/iot-events/tag-interaction`| Recebe e processa um evento de interação de tag BLE. | `202 Accepted` | `400 Bad Request` |
+
+
+## Implementação da Paginação
+
+Para garantir a escalabilidade e o desempenho da API, especialmente ao lidar com grandes volumes de dados, as listagens de motos e beacons foram implementadas com paginação.
+
+* **Parâmetros de Query:** Os endpoints `GET /api/motos` e `GET /api/beacons` aceitam os parâmetros de query opcionais `page` (número da página, padrão `1`) e `pageSize` (tamanho da página, padrão `10`).
+* **Estrutura de Resposta:** O retorno da API não é mais uma lista direta de objetos, mas sim um objeto `PaginatedResponseDto` que encapsula os resultados. Isso fornece informações essenciais para o cliente, como o número total de itens, o número da página atual, o tamanho da página e se há páginas anteriores ou seguintes.
+* **Exemplo:** Um request como `GET /api/motos?page=2&pageSize=5` retornaria os 5 primeiros itens da segunda página, junto com metadados de paginação.
+
 
 ## Testando a API
 
