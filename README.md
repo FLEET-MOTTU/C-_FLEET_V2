@@ -42,6 +42,18 @@ A API agora implementa um **CRUD completo** para as entidades `Moto` (junto de s
 * **`Middleware/`**: Contém middlewares customizados, como o `GlobalExceptionHandlerMiddleware`.
 * **`Migrations/`**: Contém os arquivos de migration gerados pelo EF Core.
 
+
+## Justificativa da Arquitetura
+
+A arquitetura do projeto foi pensada para seguir o padrão de **Clean Architecture**, promovendo uma clara separação de responsabilidades.
+
+* **`Controllers`**: Atuam como a camada mais externa, lidando apenas com a entrada e saída de dados (recebendo requisições e formatando respostas). Eles não contêm lógica de negócio.
+* **`Services`**: Representam a camada de domínio e lógica de negócio. Todas as regras da aplicação são implementadas aqui, garantindo que o comportamento da API seja consistente e centralizado. Essa separação facilita a escrita de testes unitários sem a necessidade de instanciar a camada web.
+* **`Data`**: É a camada de persistência, responsável pela comunicação com o banco de dados via Entity Framework Core. O isolamento desta camada permite a fácil substituição do banco de dados (por exemplo, de Oracle para SQL Server) sem afetar a lógica de negócio nos `Services`.
+
+Essa estrutura, em conjunto com o uso de DTOs e injeção de dependência, garante que a API siga os princípios **SOLID**.
+
+
 ## Pré-requisitos
 
 Para rodar esta aplicação localmente usando Docker, você precisará de:
