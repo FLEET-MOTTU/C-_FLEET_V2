@@ -1,35 +1,41 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Oracle.EntityFrameworkCore.Storage.Internal;
+using Swashbuckle.AspNetCore.Filters;
+
 using Csharp.Api.Data;
 using Csharp.Api.Services;
 using Csharp.Api.Middleware;
-using Microsoft.OpenApi.Models;
-using System.Text.Json.Serialization;
-using System.Reflection;
-using System.IO;
-using AutoMapper;
 using Csharp.Api.Profiles;
-using Csharp.Api.DTOs;
-using Swashbuckle.AspNetCore.Filters;
 using Csharp.Api.SwaggerExamples;
+
+using System.Text.Json.Serialization;
+using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 var oracleConnectionString = builder.Configuration.GetConnectionString("OracleConnection");
 if (string.IsNullOrEmpty(oracleConnectionString))
-{    
+{
     throw new InvalidOperationException("String de conexão 'OracleConnection' não foi encontrada ou está vazia. Verifique a configuração.");
 }
 
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseOracle(oracleConnectionString, oraOpt => {})
+    options.UseOracle(oracleConnectionString, oraOpt => 
+    {
+        oraOpt.ExecutionStrategy(c => new OracleExecutionStrategy(c));
+    })
 );
 
 // injeção de dependência
 builder.Services.AddScoped<IMotoService, MotoService>();
 builder.Services.AddScoped<IIoTEventService, IoTEventService>();
 builder.Services.AddScoped<IBeaconService, BeaconService>();
-
-// AutoMapper
+builder.Services.AddHostedService<InterServiceSyncService>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
 builder.Services.AddControllers()
@@ -37,8 +43,9 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
-    
+
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options => 
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -61,6 +68,31 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateMotoDtoExample>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var jwtKey = builder.Configuration["JwtSettings:Key"];
+    if (string.IsNullOrEmpty(jwtKey))
+    {
+        throw new InvalidOperationException("Chave JWT ('JwtSettings:Key') não encontrada ou está vazia.");
+    }
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+        ValidAudience = builder.Configuration["JwtSettings:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+});
 
 var app = builder.Build();
 
@@ -94,7 +126,7 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
