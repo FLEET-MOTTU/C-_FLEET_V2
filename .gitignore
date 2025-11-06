@@ -1,4 +1,3 @@
-docker-compose.override.yml
 **/bin/
 **/obj/
 **/packages/
@@ -23,3 +22,4 @@ test-results/
 **/coverage/
 *.swp
 *~
+**/.enV
