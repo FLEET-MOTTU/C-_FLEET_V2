@@ -3,6 +3,7 @@ using System;
 using Csharp.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
 
@@ -11,9 +12,11 @@ using Oracle.EntityFrameworkCore.Metadata;
 namespace Csharp.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251106141102_AddPateoZona")]
+    partial class AddPateoZona
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,15 +46,10 @@ namespace Csharp.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("NVARCHAR2(100)");
 
-                    b.Property<Guid?>("ZonaId")
-                        .HasColumnType("RAW(16)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BeaconId")
                         .IsUnique();
-
-                    b.HasIndex("ZonaId");
 
                     b.ToTable("Beacons");
                 });
@@ -155,50 +153,12 @@ namespace Csharp.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("NVARCHAR2(100)");
 
-                    b.Property<Guid?>("ZonaId")
-                        .HasColumnType("RAW(16)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("Placa")
-                        .IsUnique()
-                        .HasFilter("\"Placa\" IS NOT NULL");
 
                     b.HasIndex("TagBleId")
                         .IsUnique();
 
-                    b.HasIndex("ZonaId");
-
                     b.ToTable("Motos");
-                });
-
-            modelBuilder.Entity("Csharp.Api.Entities.MotoZonaHistorico", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("RAW(16)");
-
-                    b.Property<DateTime>("EntradaEm")
-                        .HasColumnType("TIMESTAMP(7)");
-
-                    b.Property<Guid?>("FuncionarioId")
-                        .HasColumnType("RAW(16)");
-
-                    b.Property<Guid>("MotoId")
-                        .HasColumnType("RAW(16)");
-
-                    b.Property<DateTime?>("SaidaEm")
-                        .HasColumnType("TIMESTAMP(7)");
-
-                    b.Property<Guid>("ZonaId")
-                        .HasColumnType("RAW(16)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ZonaId");
-
-                    b.HasIndex("MotoId", "EntradaEm");
-
-                    b.ToTable("MOTO_ZONA_HIST");
                 });
 
             modelBuilder.Entity("Csharp.Api.Entities.Pateo", b =>
@@ -302,42 +262,6 @@ namespace Csharp.Api.Migrations
                     b.ToTable("ZONAS_SYNC", (string)null);
                 });
 
-            modelBuilder.Entity("Csharp.Api.Entities.ZonaRegraStatus", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("RAW(16)");
-
-                    b.Property<Guid>("PateoId")
-                        .HasColumnType("RAW(16)");
-
-                    b.Property<int>("Prioridade")
-                        .HasColumnType("NUMBER(10)");
-
-                    b.Property<int>("StatusMoto")
-                        .HasColumnType("NUMBER(10)");
-
-                    b.Property<Guid>("ZonaId")
-                        .HasColumnType("RAW(16)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ZonaId");
-
-                    b.HasIndex("PateoId", "StatusMoto", "Prioridade")
-                        .IsUnique();
-
-                    b.ToTable("ZONA_REGRA_STATUS");
-                });
-
-            modelBuilder.Entity("Csharp.Api.Entities.Beacon", b =>
-                {
-                    b.HasOne("Csharp.Api.Entities.Zona", "Zona")
-                        .WithMany()
-                        .HasForeignKey("ZonaId");
-
-                    b.Navigation("Zona");
-                });
-
             modelBuilder.Entity("Csharp.Api.Entities.Funcionario", b =>
                 {
                     b.HasOne("Csharp.Api.Entities.Pateo", "Pateo")
@@ -357,32 +281,7 @@ namespace Csharp.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Csharp.Api.Entities.Zona", "Zona")
-                        .WithMany()
-                        .HasForeignKey("ZonaId");
-
                     b.Navigation("Tag");
-
-                    b.Navigation("Zona");
-                });
-
-            modelBuilder.Entity("Csharp.Api.Entities.MotoZonaHistorico", b =>
-                {
-                    b.HasOne("Csharp.Api.Entities.Moto", "Moto")
-                        .WithMany()
-                        .HasForeignKey("MotoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Csharp.Api.Entities.Zona", "Zona")
-                        .WithMany()
-                        .HasForeignKey("ZonaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Moto");
-
-                    b.Navigation("Zona");
                 });
 
             modelBuilder.Entity("Csharp.Api.Entities.Zona", b =>
@@ -394,25 +293,6 @@ namespace Csharp.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Pateo");
-                });
-
-            modelBuilder.Entity("Csharp.Api.Entities.ZonaRegraStatus", b =>
-                {
-                    b.HasOne("Csharp.Api.Entities.Pateo", "Pateo")
-                        .WithMany()
-                        .HasForeignKey("PateoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Csharp.Api.Entities.Zona", "Zona")
-                        .WithMany()
-                        .HasForeignKey("ZonaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Pateo");
-
-                    b.Navigation("Zona");
                 });
 
             modelBuilder.Entity("Csharp.Api.Entities.Pateo", b =>

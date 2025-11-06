@@ -1,14 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Csharp.Api.DTOs
+namespace Csharp.Api.DTOs.Sync
 {
-    /**
-     * O "envelope" genérico que o Java envia.
-     * O campo 'Data' é desserializado como um JsonElement genérico
-     * para que possamos decidir qual DTO específica (Funcionario, Pateo, Zona)
-     * usar com base no 'EventType'.
-     */
+    /// <summary>Envelope genérico vindo do Java; roteia pelo eventType.</summary>
     public class InterServiceMessage
     {
         [JsonPropertyName("eventType")]

@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Csharp.Api.Entities
 {
+    /// <summary>
+    /// Funcionário (réplica de fonte Java). Não altere schema/colunas daqui.
+    /// </summary>
     [Table("FUNCIONARIOS_SYNC")]
     [Index(nameof(Email), IsUnique = true)]
     [Index(nameof(Telefone), IsUnique = true)]
@@ -13,8 +16,7 @@ namespace Csharp.Api.Entities
         [Column("ID")]
         public Guid Id { get; set; }
 
-        [Required]
-        [StringLength(100)]
+        [Required, StringLength(100)]
         [Column("NOME")]
         public string Nome { get; set; } = string.Empty;
 
@@ -40,7 +42,7 @@ namespace Csharp.Api.Entities
         [Column("FOTO_URL")]
         public string? FotoUrl { get; set; }
 
-        [ForeignKey("PateoId")]
+        [ForeignKey(nameof(PateoId))]
         public virtual Pateo Pateo { get; set; } = null!;
     }
 }

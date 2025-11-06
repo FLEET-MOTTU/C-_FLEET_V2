@@ -1,14 +1,17 @@
 namespace Csharp.Api.Entities.Enums
 {
+    /// <summary>
+    /// Estados de ciclo de vida e operação da moto (coleta, pátio e externos).
+    /// </summary>
     public enum TipoStatusMoto
     {
-        // Status relacionados ao processo de coleta
+        // Coleta
         PendenteColeta,
         SemPlacaEmColeta,
         MinhaMottuEmColeta,
         EmTransitoComFuncionario,
 
-        // Status dentro do pátio
+        // Pátio
         AguardandoVistoria,
         EmReparosSimples,
         EmReparosComplexos,
@@ -17,7 +20,7 @@ namespace Csharp.Api.Entities.Enums
         ManutencaoConcluida,
         ProntaParaAluguel,
 
-        // Status mais amplos
+        // Externos
         Alugada,
         Baixada
     }

@@ -1,17 +1,22 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Csharp.Api.DTOs;
 using Csharp.Api.Services;
-using Microsoft.Extensions.Logging;
+using Csharp.Api.Enums;
 
 namespace Csharp.Api.Controllers
 {
-
+    /// <summary>
+    /// Operações de motos (CRUD + utilidades operacionais).
+    /// </summary>
     [ApiController]
     [Route("api/motos")]
+    [Authorize(Policy = "RolesOperacionais")]
+    [Produces("application/json")]
     public class MotosController : ControllerBase
     {
         private readonly IMotoService _motoService;
@@ -23,16 +28,7 @@ namespace Csharp.Api.Controllers
             _logger = logger;
         }
 
-        /// <summary>
-        /// Cria uma nova moto no sistema.
-        /// </summary>
-        /// <remarks>
-        /// A placa da moto é opcional apenas se o 'statusMoto' for 'SemPlacaEmColeta'.
-        /// Uma nova Tag BLE será criada e associada automaticamente à moto com base no 'codigoUnicoTagParaNovaTag'.
-        /// </remarks>
-        /// <response code="201">Retorna a moto recém-criada e a URL para acessá-la.</response>
-        /// <response code="400">Se os dados fornecidos forem inválidos ou incompletos.</response>
-        /// <response code="409">Se a placa ou o código da tag já existirem no sistema.</response>
+        /// <summary>Cria uma nova moto com tag associada.</summary>
         [HttpPost]
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -41,39 +37,29 @@ namespace Csharp.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("CreateMoto: ModelState inválido ao tentar criar moto.");
-                return BadRequest(ModelState);
+                _logger.LogWarning("CreateMoto: ModelState inválido.");
+                return ValidationProblem(ModelState);
             }
+
             var motoCriada = await _motoService.CreateMotoAsync(createMotoDto);
             return CreatedAtAction(nameof(GetMotoById), new { id = motoCriada.Id }, motoCriada);
         }
 
-        /// <summary>
-        /// Lista todas as motos cadastradas, com suporte a paginação e filtros.
-        /// </summary>
-        /// <param name="status">Filtra motos por um status específico (ex: "ProntaParaAluguel"). Case-insensitive.</param>
-        /// <param name="placa">Filtra motos por parte da placa (busca parcial, case-insensitive).</param>
-        /// <param name="page">Número da página a ser retornada. Valor padrão é 1.</param>
-        /// <param name="pageSize">Número de itens por página. Valor padrão é 10.</param>
-        /// <returns>Uma lista paginada de motos.</returns>
-        /// <response code="200">Retorna a lista paginada de motos (pode ser vazia).</response>
-        /// <response code="400">Se os parâmetros de filtro ou paginação forem inválidos.</response>
+        /// <summary>Lista motos com filtros e paginação.</summary>
         [HttpGet]
         [ProducesResponseType(typeof(PaginatedResponseDto<MotoViewDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAllMotos([FromQuery] string? status, [FromQuery] string? placa, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetAllMotos(
+            [FromQuery] string? status,
+            [FromQuery] string? placa,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
             var motos = await _motoService.GetAllMotosAsync(status, placa, page, pageSize);
             return Ok(motos);
         }
 
-        /// <summary>
-        /// Obtém os detalhes de uma moto específica pelo seu ID.
-        /// </summary>
-        /// <param name="id">O ID (GUID) da moto a ser recuperada.</param>
-        /// <returns>Os detalhes da moto.</returns>
-        /// <response code="200">Retorna os detalhes da moto.</response>
-        /// <response code="404">Se a moto com o ID especificado não for encontrada.</response>
+        /// <summary>Obtém moto por ID.</summary>
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -83,14 +69,7 @@ namespace Csharp.Api.Controllers
             return Ok(moto);
         }
 
-        /// <summary>
-        /// Obtém os detalhes de uma moto específica pela sua placa.
-        /// </summary>
-        /// <param name="placa">A placa da moto a ser recuperada.</param>
-        /// <returns>Os detalhes da moto.</returns>
-        /// <response code="200">Retorna os detalhes da moto.</response>
-        /// <response code="400">Se a placa fornecida for inválida (ex: vazia).</response>
-        /// <response code="404">Se a moto com a placa especificada não for encontrada.</response>
+        /// <summary>Obtém moto por placa.</summary>
         [HttpGet("por-placa/{placa}")]
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -101,16 +80,7 @@ namespace Csharp.Api.Controllers
             return Ok(moto);
         }
 
-        /// <summary>
-        /// Atualiza os dados de uma moto existente.
-        /// </summary>
-        /// <param name="id">O ID (GUID) da moto a ser atualizada.</param>
-        /// <param name="updateMotoDto">Objeto contendo os dados da moto para atualização (Placa, Modelo, StatusMoto).</param>
-        /// <returns>Retorna o objeto da moto atualizada.</returns>
-        /// <response code="200">Retorna a moto atualizada.</response>
-        /// <response code="400">Se os dados fornecidos forem inválidos.</response>
-        /// <response code="404">Se a moto com o ID especificado não for encontrada.</response>
-        /// <response code="409">Se a nova placa já existir em outra moto ou houver um erro de concorrência.</response>
+        /// <summary>Atualiza moto.</summary>
         [HttpPut("{id:guid}")]
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -121,28 +91,52 @@ namespace Csharp.Api.Controllers
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("UpdateMoto: ModelState inválido para ID {MotoId}.", id);
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
+
             var motoAtualizadaDto = await _motoService.UpdateMotoAsync(id, updateMotoDto);
             return Ok(motoAtualizadaDto);
         }
 
-        /// <summary>
-        /// Remove uma moto do sistema.
-        /// </summary>
-        /// <remarks>
-        /// Ao remover uma moto, a Tag BLE associada a ela também será removida.
-        /// </remarks>
-        /// <param name="id">O ID (GUID) da moto a ser removida.</param>
-        /// <returns>Nenhum conteúdo se a remoção for bem-sucedida.</returns>
-        /// <response code="204">Moto removida com sucesso.</response>
-        /// <response code="404">Se a moto com o ID especificado não for encontrada.</response>
+        /// <summary>Exclui moto (e a tag associada).</summary>
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteMoto(Guid id)
         {
             await _motoService.DeleteMotoAsync(id);
+            return NoContent();
+        }
+
+        // ----------- Utilidades Operacionais -----------
+
+        /// <summary>
+        /// Upsert por placa: cria/atualiza e garante vínculo com a Tag e (opcional) Zona.
+        /// </summary>
+        [HttpPost("upsert-por-placa")]
+        [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> UpsertPorPlaca([FromBody] UpsertMotoPorPlacaDto dto)
+        {
+            if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+            var result = await _motoService.UpsertPorPlacaAsync(dto.Placa, dto.Modelo, dto.StatusMoto, dto.CodigoUnicoTag, dto.ZonaId);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Reatribui a Tag de uma moto (substituição de tag).
+        /// </summary>
+        [HttpPut("{id:guid}/reassign-tag")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> ReassignTag(Guid id, [FromBody] ReassignTagDto dto)
+        {
+            if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+            await _motoService.ReassignTagAsync(id, dto.CodigoUnicoTagNovo);
             return NoContent();
         }
     }

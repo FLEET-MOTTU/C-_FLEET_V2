@@ -2,6 +2,7 @@ using Csharp.Api.DTOs;
 
 namespace Csharp.Api.Services
 {
+    /// <summary>Contrato para operações de Beacons.</summary>
     public interface IBeaconService
     {
         Task<PaginatedResponseDto<BeaconDto>> GetAllBeaconsAsync(int page, int pageSize);

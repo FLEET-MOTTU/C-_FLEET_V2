@@ -1,20 +1,19 @@
 using System.Text.Json;
-
 using Azure.Messaging.ServiceBus;
-using Microsoft.EntityFrameworkCore;
-
 using Csharp.Api.Data;
-using Csharp.Api.DTOs;
-using Csharp.Api.DTOs.ValidationAttributes;
+using Csharp.Api.DTOs.Sync;
 using Csharp.Api.Entities;
-
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Csharp.Api.Services
 {
-    /**
-     * Serviço de background (IHostedService) que ouve a fila de sincronização
-     * inter-serviços (populada pelo Java) e atualiza o banco de dados local do C#.
-     */
+    /// <summary>
+    /// Consome fila de sync (Java → C#) e replica Pátio/Zona/Funcionário.
+    /// </summary>
     public class InterServiceSyncService : IHostedService
     {
         private readonly ILogger<InterServiceSyncService> _logger;
@@ -22,207 +21,179 @@ namespace Csharp.Api.Services
         private readonly ServiceBusProcessor _processor;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        // Construtor com o nome da classe atualizado
-        public InterServiceSyncService(IConfiguration configuration, IServiceProvider serviceProvider, ILogger<InterServiceSyncService> logger)
+        public InterServiceSyncService(IConfiguration configuration,
+                                       IServiceProvider serviceProvider,
+                                       ILogger<InterServiceSyncService> logger)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
 
             var connectionString = configuration["AzureServiceBus:ConnectionString"];
-            var queueName = configuration["AzureServiceBus:QueueName"];
+            var queueName        = configuration["AzureServiceBus:QueueName"];
+
+            if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(queueName))
+                throw new InvalidOperationException("Config AzureServiceBus (ConnectionString/QueueName) ausente.");
 
             var client = new ServiceBusClient(connectionString);
-            _processor = client.CreateProcessor(queueName, new ServiceBusProcessorOptions());
+            _processor = client.CreateProcessor(queueName, new ServiceBusProcessorOptions
+            {
+                MaxConcurrentCalls = 4,
+                AutoCompleteMessages = false
+            });
 
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Iniciando InterServiceSyncService (Listener da Fila)..."); // Nome do log mudou
+            _logger.LogInformation("Iniciando InterServiceSyncService...");
             _processor.ProcessMessageAsync += HandleMessageAsync;
-            _processor.ProcessErrorAsync += HandleErrorAsync;
+            _processor.ProcessErrorAsync   += HandleErrorAsync;
             await _processor.StartProcessingAsync(cancellationToken);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Encerrando InterServiceSyncService..."); // Nome do log mudou
+            _logger.LogInformation("Encerrando InterServiceSyncService...");
             await _processor.StopProcessingAsync(cancellationToken);
         }
 
         private Task HandleErrorAsync(ProcessErrorEventArgs args)
         {
-            _logger.LogError(args.Exception, "Erro ao processar mensagem da fila: {ErrorSource} {EntityPath}", args.ErrorSource, args.EntityPath);
+            _logger.LogError(args.Exception, "Erro fila sync: {Source} {Path}", args.ErrorSource, args.EntityPath);
             return Task.CompletedTask;
         }
 
-        // --- MÉTODO HandleMessageAsync ATUALIZADO ---
         private async Task HandleMessageAsync(ProcessMessageEventArgs args)
         {
-            string body = args.Message.Body.ToString();
-            _logger.LogInformation("Mensagem de sincronização recebida: {Body}", body);
+            var body = args.Message.Body.ToString();
+            _logger.LogDebug("Sync mensagem: {Body}", body);
 
             try
             {
-                // 1. Desserializa para o "envelope" genérico InterServiceMessage
-                var message = JsonSerializer.Deserialize<InterServiceMessage>(body, _jsonOptions);
-                if (message == null || string.IsNullOrEmpty(message.EventType))
+                var envelope = JsonSerializer.Deserialize<InterServiceMessage>(body, _jsonOptions);
+                if (envelope == null || string.IsNullOrWhiteSpace(envelope.EventType))
                 {
-                    _logger.LogWarning("Não foi possível desserializar o envelope da mensagem.");
-                    await args.CompleteMessageAsync(args.Message);
+                    _logger.LogWarning("Envelope inválido. DLQ.");
+                    await args.DeadLetterMessageAsync(args.Message, "Invalid envelope");
                     return;
                 }
 
-                // Cria um escopo para o DbContext
-                using (var scope = _serviceProvider.CreateScope())
-                {
-                    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                using var scope = _serviceProvider.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                    // 2. ROTEIA a mensagem com base no eventType
-                    await ProcessEvent(context, message.EventType, message.Data);
-                }
+                await ProcessEventAsync(db, envelope.EventType, envelope.Data);
 
+                await db.SaveChangesAsync();
                 await args.CompleteMessageAsync(args.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro crítico ao processar evento. Enviando para Dead Letter Queue.");
+                _logger.LogError(ex, "Falha ao processar mensagem de sync. DLQ.");
                 await args.DeadLetterMessageAsync(args.Message, ex.Message);
             }
         }
 
-        // --- MÉTODO ProcessEvent ATUALIZADO (O Roteador) ---
-        // Recebe o JsonElement genérico e decide o que fazer
-        private async Task ProcessEvent(AppDbContext context, string eventType, JsonElement data)
+        private async Task ProcessEventAsync(AppDbContext db, string eventType, JsonElement data)
         {
-            // Roteia para o processador correto
             switch (eventType)
             {
-                // Eventos de Funcionário
+                // Funcionário
                 case "FUNCIONARIO_CRIADO":
                 case "FUNCIONARIO_ATUALIZADO":
                 case "FUNCIONARIO_ATUALIZADO_FOTO":
                 case "FUNCIONARIO_REATIVADO":
                 case "FUNCIONARIO_DESATIVADO":
-                    var funcPayload = data.Deserialize<FuncionarioSyncPayload>(_jsonOptions);
-                    if (funcPayload != null) await ProcessFuncionarioEvent(context, funcPayload);
+                {
+                    var payload = data.Deserialize<FuncionarioSyncPayload>(_jsonOptions);
+                    if (payload != null) await UpsertFuncionarioAsync(db, payload);
                     break;
+                }
 
-                // Eventos de Pátio
+                // Pátio
                 case "PATEO_CRIADO":
                 case "PATEO_ATUALIZADO":
-                    var pateoPayload = data.Deserialize<PateoSyncPayload>(_jsonOptions);
-                    if (pateoPayload != null) await ProcessPateoEvent(context, pateoPayload);
+                {
+                    var payload = data.Deserialize<PateoSyncPayload>(_jsonOptions);
+                    if (payload != null) await UpsertPateoAsync(db, payload);
                     break;
+                }
 
-                // Eventos de Zona
+                // Zona
                 case "ZONA_CRIADA":
                 case "ZONA_ATUALIZADA":
-                    var zonaPayload = data.Deserialize<ZonaSyncPayload>(_jsonOptions);
-                    if (zonaPayload != null) await ProcessZonaEvent(context, zonaPayload);
+                {
+                    var payload = data.Deserialize<ZonaSyncPayload>(_jsonOptions);
+                    if (payload != null) await UpsertZonaAsync(db, payload);
                     break;
+                }
 
                 case "ZONA_DELETADA":
-                    var zonaDelPayload = data.Deserialize<ZonaSyncPayload>(_jsonOptions);
-                    if (zonaDelPayload != null) await ProcessZonaDeleteEvent(context, zonaDelPayload);
+                {
+                    var payload = data.Deserialize<ZonaSyncPayload>(_jsonOptions);
+                    if (payload != null) await DeleteZonaAsync(db, payload);
                     break;
+                }
 
                 default:
-                    _logger.LogWarning("Tipo de evento desconhecido: {EventType}", eventType);
+                    _logger.LogWarning("EventType desconhecido: {EventType}", eventType);
                     break;
             }
-
-            // Salva as mudanças (se houver alguma) no final do roteamento
-            await context.SaveChangesAsync();
         }
 
-        // --- MÉTODOS DE PROCESSAMENTO (O que já tínhamos + os novos) ---
-
-        // Lógica de Funcionário (o que já tínhamos)
-        private async Task ProcessFuncionarioEvent(AppDbContext context, FuncionarioSyncPayload data)
+        private static async Task UpsertFuncionarioAsync(AppDbContext db, FuncionarioSyncPayload d)
         {
-            var funcionario = await context.Funcionarios.FindAsync(data.Id);
-            if (funcionario == null)
+            var f = await db.Funcionarios.FirstOrDefaultAsync(x => x.Id == d.Id);
+            if (f == null)
             {
-                _logger.LogInformation("Criando novo funcionário no banco C#: {FuncionarioId}", data.Id);
-                funcionario = new Funcionario { Id = data.Id }; // O Id vem do Java
-                context.Funcionarios.Add(funcionario);
+                f = new Funcionario { Id = d.Id };
+                db.Funcionarios.Add(f);
             }
-            else
-            {
-                _logger.LogInformation("Atualizando funcionário no banco C#: {FuncionarioId}", data.Id);
-            }
-
-            // Mapeamento (Atualiza/Insere)
-            funcionario.Nome = data.Nome;
-            funcionario.Email = data.Email;
-            funcionario.Telefone = data.Telefone;
-            funcionario.Cargo = data.Cargo;
-            funcionario.Status = data.Status;
-            funcionario.PateoId = data.PateoId;
-            funcionario.FotoUrl = data.FotoUrl;
+            f.Nome = d.Nome;
+            f.Email = d.Email;
+            f.Telefone = d.Telefone;
+            f.Cargo = d.Cargo;
+            f.Status = d.Status;
+            f.PateoId = d.PateoId;
+            f.FotoUrl = d.FotoUrl;
         }
 
-        // --- NOVA LÓGICA DE PÁTIO (Criar/Atualizar) ---
-        private async Task ProcessPateoEvent(AppDbContext context, PateoSyncPayload data)
+        private static async Task UpsertPateoAsync(AppDbContext db, PateoSyncPayload d)
         {
-            var pateo = await context.Pateos.FindAsync(data.Id);
-            if (pateo == null)
+            var p = await db.Pateos.FirstOrDefaultAsync(x => x.Id == d.Id);
+            if (p == null)
             {
-                _logger.LogInformation("Criando novo pátio no banco C#: {PateoId}", data.Id);
-                pateo = new Pateo { Id = data.Id };
-                context.Pateos.Add(pateo);
+                p = new Pateo { Id = d.Id, CreatedAt = DateTime.UtcNow };
+                db.Pateos.Add(p);
             }
-            else
-            {
-                _logger.LogInformation("Atualizando pátio no banco C#: {PateoId}", data.Id);
-            }
-
-            pateo.Nome = data.Nome;
-            pateo.Status = data.Status;
-            pateo.PlantaBaixaUrl = data.PlantaBaixaUrl;
-            pateo.PlantaLargura = data.PlantaLargura;
-            pateo.PlantaAltura = data.PlantaAltura;
-            pateo.GerenciadoPorId = data.GerenciadoPorId;
-            pateo.CreatedAt = DateTime.UtcNow; // Aproximação do tempo de criação
+            p.Nome = d.Nome;
+            p.Status = d.Status;
+            p.PlantaBaixaUrl = d.PlantaBaixaUrl;
+            p.PlantaLargura = d.PlantaLargura;
+            p.PlantaAltura = d.PlantaAltura;
+            p.GerenciadoPorId = d.GerenciadoPorId;
+            // não tocar CreatedAt em updates
         }
 
-        // --- NOVA LÓGICA DE ZONA (Criar/Atualizar) ---
-        private async Task ProcessZonaEvent(AppDbContext context, ZonaSyncPayload data)
+        private static async Task UpsertZonaAsync(AppDbContext db, ZonaSyncPayload d)
         {
-            var zona = await context.Zonas.FindAsync(data.Id);
-            if (zona == null)
+            var z = await db.Zonas.FirstOrDefaultAsync(x => x.Id == d.Id);
+            if (z == null)
             {
-                _logger.LogInformation("Criando nova zona no banco C#: {ZonaId}", data.Id);
-                zona = new Zona { Id = data.Id };
-                context.Zonas.Add(zona);
+                z = new Zona { Id = d.Id, CreatedAt = DateTime.UtcNow };
+                db.Zonas.Add(z);
             }
-            else
-            {
-                _logger.LogInformation("Atualizando zona no banco C#: {ZonaId}", data.Id);
-            }
-
-            zona.Nome = data.Nome;
-            zona.PateoId = data.PateoId;
-            zona.CriadoPorId = data.CriadoPorId;
-            zona.CoordenadasWKT = data.CoordenadasWKT; // Salvamos o WKT (texto)
-            zona.CreatedAt = DateTime.UtcNow; // Aproximação
+            z.Nome = d.Nome;
+            z.PateoId = d.PateoId;
+            z.CriadoPorId = d.CriadoPorId;
+            z.CoordenadasWKT = d.CoordenadasWKT;
+            // não tocar CreatedAt em updates
         }
 
-        // --- NOVA LÓGICA DE ZONA (Deletar) ---
-        private async Task ProcessZonaDeleteEvent(AppDbContext context, ZonaSyncPayload data)
+        private static async Task DeleteZonaAsync(AppDbContext db, ZonaSyncPayload d)
         {
-            var zona = await context.Zonas.FindAsync(data.Id);
-            if (zona != null)
-            {
-                _logger.LogInformation("Deletando zona do banco C#: {ZonaId}", data.Id);
-                context.Zonas.Remove(zona);
-            }
-            else
-            {
-                _logger.LogWarning("Recebido evento ZONA_DELETADA, mas zona {ZonaId} não foi encontrada.", data.Id);
-            }
+            var z = await db.Zonas.FirstOrDefaultAsync(x => x.Id == d.Id);
+            if (z != null) db.Zonas.Remove(z);
         }
     }
 }

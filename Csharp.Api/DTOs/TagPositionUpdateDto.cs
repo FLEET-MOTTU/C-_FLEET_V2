@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Csharp.Api.DTOs
 {
-    /// <summary>Evento recebido via API (simulada) de interação da tag com um beacon.</summary>
-    public class TagInteractionEventDto
+    /// <summary>Mensagem consumida da fila de posicionamento (gateways/beacons).</summary>
+    public class TagPositionUpdateDto
     {
         [Required, StringLength(50)]
         public string CodigoUnicoTag { get; set; } = string.Empty;
@@ -15,10 +15,8 @@ namespace Csharp.Api.DTOs
         [Required]
         public DateTime Timestamp { get; set; }
 
+        /// <summary>Opcional. Se informado, atualiza a % de bateria da Tag.</summary>
         [Range(0, 100)]
         public int? NivelBateria { get; set; }
-
-        [StringLength(50)]
-        public string? TipoEvento { get; set; }
     }
 }

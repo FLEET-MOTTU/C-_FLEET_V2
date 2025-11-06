@@ -5,16 +5,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Csharp.Api.Entities
 {
-    // Cópia da tabela "pateo" do Java
+    /// <summary>
+    /// Pátio (réplica de fonte Java). Não altere schema/colunas daqui.
+    /// </summary>
     [Table("PATEOS_SYNC")]
     public class Pateo
     {
         [Key]
         [Column("ID")]
-        public Guid Id { get; set; } // Vem do Java
+        public Guid Id { get; set; }
 
-        [Required]
-        [StringLength(100)]
+        [Required, StringLength(100)]
         [Column("NOME")]
         public string Nome { get; set; } = string.Empty;
 
@@ -30,15 +31,14 @@ namespace Csharp.Api.Entities
         [Column("GERENCIADO_POR_ID")]
         public Guid GerenciadoPorId { get; set; }
 
-        [Required]
-        [StringLength(20)]
+        [Required, StringLength(20)]
         [Column("STATUS")]
         public string Status { get; set; } = string.Empty;
 
         [Column("CREATED_AT")]
         public DateTime CreatedAt { get; set; }
 
-        // Relacionamentos (Lado C#)
+        // Navegações (lado C#)
         public virtual ICollection<Funcionario> Funcionarios { get; set; } = new List<Funcionario>();
         public virtual ICollection<Zona> Zonas { get; set; } = new List<Zona>();
     }

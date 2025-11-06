@@ -1,33 +1,31 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-// NOTA: Para usar 'Polygon', você precisará do pacote NuGet 'NetTopologySuite.IO.Oracle'
-// e configurar o DbContext. Por enquanto, vamos salvar como WKT (texto) para simplificar.
-// using NetTopologySuite.Geometries; 
 
 namespace Csharp.Api.Entities
 {
-    // Cópia da tabela "zona" do Java
+    /// <summary>
+    /// Zona física do pátio (réplica de fonte Java). Polígono salvo como WKT.
+    /// </summary>
     [Table("ZONAS_SYNC")]
     public class Zona
     {
         [Key]
         [Column("ID")]
-        public Guid Id { get; set; } // Vem do Java
+        public Guid Id { get; set; }
 
-        [Required]
-        [StringLength(100)]
+        [Required, StringLength(100)]
         [Column("NOME")]
         public string Nome { get; set; } = string.Empty;
 
         [Column("PATEO_ID")]
         public Guid PateoId { get; set; }
 
-        [ForeignKey("PateoId")]
+        [ForeignKey(nameof(PateoId))]
         public virtual Pateo Pateo { get; set; } = null!;
 
         [Column("CRIADO_POR_ID")]
-        public Guid CriadoPorId { get; set; } // ID do UsuarioAdmin
+        public Guid CriadoPorId { get; set; }
 
         [Required]
         [Column("COORDENADAS_WKT")]

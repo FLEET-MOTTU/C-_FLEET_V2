@@ -1,18 +1,20 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Csharp.Api.DTOs
 {
     public class CreateBeaconDto
     {
-        [Required]
-        [StringLength(100)]
+        [Required, StringLength(100)]
         public string BeaconId { get; set; } = string.Empty;
+
         public bool Ativo { get; set; }
     }
 
     public class UpdateBeaconDto
     {
         public bool Ativo { get; set; }
+
         [StringLength(100)]
         public string? UltimaZonaDetectada { get; set; }
     }
