@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="f311cc88-2195-4ff1-9f3b-8018dd8dcea8" name="jou_tiago@DESKTOP-97890J2 2025-11-07 13:11:34" runUser="DESKTOP-97890J2\jou_tiago" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-11-07T13:11:34.4743401-03:00" queuing="2025-11-07T13:11:34.4743405-03:00" start="2025-11-07T13:11:32.3731176-03:00" finish="2025-11-07T13:11:34.5291346-03:00" />
+  <TestSettings name="default" id="c3889395-a7f1-4354-9522-15544782670b">
+    <Deployment runDeploymentRoot="jou_tiago_DESKTOP-97890J2_2025-11-07_13_11_34" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="48f3dd6f-fc65-4e89-ad20-5e945e418b06" testId="6fc2e574-a4e5-d38b-d162-3b1819b44e14" testName="Csharp.Api.Tests.Unit.Services.MotoServiceTests.UpsertPorPlacaAsync_ShouldUpdateExistingMoto_WhenPlacaIsFound" computerName="DESKTOP-97890J2" duration="00:00:00.0195759" startTime="2025-11-07T13:11:34.4274831-03:00" endTime="2025-11-07T13:11:34.4274836-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="48f3dd6f-fc65-4e89-ad20-5e945e418b06" />
+    <UnitTestResult executionId="6bab26e1-5d44-4e56-845b-ae6f3c35f30d" testId="3f8d1d3d-07c4-6811-01d9-b6c21d2adba4" testName="Csharp.Api.Tests.Unit.Services.MotoServiceTests.UpsertPorPlacaAsync_ShouldCreateNewMotoAndTag_WhenPlacaAndTagAreNew" computerName="DESKTOP-97890J2" duration="00:00:01.1320060" startTime="2025-11-07T13:11:34.3120433-03:00" endTime="2025-11-07T13:11:34.3120819-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6bab26e1-5d44-4e56-845b-ae6f3c35f30d" />
+    <UnitTestResult executionId="d3ed2a81-f46e-41ef-b7d5-ff4c300c066b" testId="f802efd6-4c56-cf9a-d6c0-e5a9f32ff922" testName="Csharp.Api.Tests.Unit.Services.TagPositionProcessorTests.ProcessAsync_ShouldUpdateBattery_WhenBatteryIsDifferent" computerName="DESKTOP-97890J2" duration="00:00:00.0088465" startTime="2025-11-07T13:11:34.4251123-03:00" endTime="2025-11-07T13:11:34.4251124-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d3ed2a81-f46e-41ef-b7d5-ff4c300c066b" />
+    <UnitTestResult executionId="29db6d9c-e021-434b-9e9a-99cfe443b7e4" testId="cb233109-0a5b-1f89-efd0-355143dc385e" testName="Csharp.Api.Tests.Unit.Services.MotoServiceTests.CreateMotoAsync_ShouldThrow_WhenTagAlreadyExists" computerName="DESKTOP-97890J2" duration="00:00:00.0615155" startTime="2025-11-07T13:11:34.3725334-03:00" endTime="2025-11-07T13:11:34.3725339-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="29db6d9c-e021-434b-9e9a-99cfe443b7e4" />
+    <UnitTestResult executionId="e192056d-383e-4cf3-a67d-c46f645e462e" testId="9e030ab3-5135-fac6-4c79-67520a28be61" testName="Csharp.Api.Tests.Unit.Services.TagPositionProcessorTests.ProcessAsync_ShouldUpdateLocation_And_CreateNewHistory_WhenMotoMovesToNewZone" computerName="DESKTOP-97890J2" duration="00:00:00.0648492" startTime="2025-11-07T13:11:34.4247193-03:00" endTime="2025-11-07T13:11:34.4247194-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e192056d-383e-4cf3-a67d-c46f645e462e" />
+    <UnitTestResult executionId="e35a1ce3-b0b9-479c-b9cf-0a5359624b76" testId="1e662013-2663-8b4a-77d8-1e0d9a02ca1b" testName="Csharp.Api.Tests.Unit.Services.MotoServiceTests.CreateMotoAsync_ShouldCreateMoto_WhenDataIsValid" computerName="DESKTOP-97890J2" duration="00:00:00.0233300" startTime="2025-11-07T13:11:34.4245377-03:00" endTime="2025-11-07T13:11:34.4245378-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e35a1ce3-b0b9-479c-b9cf-0a5359624b76" />
+    <UnitTestResult executionId="a2d3136c-8d58-41af-8942-6ce70b0c1f89" testId="3a189c2e-1a15-40ce-871d-e99cacd427e5" testName="Csharp.Api.Tests.Unit.Services.MotoServiceTests.UpsertPorPlacaAsync_ShouldThrow_WhenTagIsAssignedToDifferentMoto" computerName="DESKTOP-97890J2" duration="00:00:00.0061180" startTime="2025-11-07T13:11:34.4246319-03:00" endTime="2025-11-07T13:11:34.4246320-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a2d3136c-8d58-41af-8942-6ce70b0c1f89" />
+    <UnitTestResult executionId="1814d175-c8c8-4192-8561-43b07f186133" testId="326163e4-1da3-6393-d7e7-7cab5106671d" testName="Csharp.Api.Tests.Unit.Services.TagPositionProcessorTests.ProcessAsync_ShouldOnlyUpdateTimestamp_WhenBeaconIsInSameZone" computerName="DESKTOP-97890J2" duration="00:00:01.1700117" startTime="2025-11-07T13:11:34.3416406-03:00" endTime="2025-11-07T13:11:34.3416411-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1814d175-c8c8-4192-8561-43b07f186133" />
+    <UnitTestResult executionId="b22aa7a0-3d7b-49e1-aaa5-d33e416dac25" testId="1d1f3d5d-d9ca-9aa9-1d26-3e691174ae7c" testName="Csharp.Api.Tests.Unit.Services.MotoServiceTests.CreateMotoAsync_ShouldThrow_WhenPlacaAlreadyExists" computerName="DESKTOP-97890J2" duration="00:00:00.0053407" startTime="2025-11-07T13:11:34.4250272-03:00" endTime="2025-11-07T13:11:34.4250273-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b22aa7a0-3d7b-49e1-aaa5-d33e416dac25" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Csharp.Api.Tests.Unit.Services.MotoServiceTests.CreateMotoAsync_ShouldThrow_WhenPlacaAlreadyExists" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.unit\bin\debug\net8.0\csharp.api.tests.unit.dll" id="1d1f3d5d-d9ca-9aa9-1d26-3e691174ae7c">
+      <Execution id="b22aa7a0-3d7b-49e1-aaa5-d33e416dac25" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Unit\bin\Debug\net8.0\Csharp.Api.Tests.Unit.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Unit.Services.MotoServiceTests" name="CreateMotoAsync_ShouldThrow_WhenPlacaAlreadyExists" />
+    </UnitTest>
+    <UnitTest name="Csharp.Api.Tests.Unit.Services.MotoServiceTests.CreateMotoAsync_ShouldCreateMoto_WhenDataIsValid" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.unit\bin\debug\net8.0\csharp.api.tests.unit.dll" id="1e662013-2663-8b4a-77d8-1e0d9a02ca1b">
+      <Execution id="e35a1ce3-b0b9-479c-b9cf-0a5359624b76" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Unit\bin\Debug\net8.0\Csharp.Api.Tests.Unit.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Unit.Services.MotoServiceTests" name="CreateMotoAsync_ShouldCreateMoto_WhenDataIsValid" />
+    </UnitTest>
+    <UnitTest name="Csharp.Api.Tests.Unit.Services.MotoServiceTests.UpsertPorPlacaAsync_ShouldCreateNewMotoAndTag_WhenPlacaAndTagAreNew" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.unit\bin\debug\net8.0\csharp.api.tests.unit.dll" id="3f8d1d3d-07c4-6811-01d9-b6c21d2adba4">
+      <Execution id="6bab26e1-5d44-4e56-845b-ae6f3c35f30d" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Unit\bin\Debug\net8.0\Csharp.Api.Tests.Unit.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Unit.Services.MotoServiceTests" name="UpsertPorPlacaAsync_ShouldCreateNewMotoAndTag_WhenPlacaAndTagAreNew" />
+    </UnitTest>
+    <UnitTest name="Csharp.Api.Tests.Unit.Services.TagPositionProcessorTests.ProcessAsync_ShouldUpdateBattery_WhenBatteryIsDifferent" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.unit\bin\debug\net8.0\csharp.api.tests.unit.dll" id="f802efd6-4c56-cf9a-d6c0-e5a9f32ff922">
+      <Execution id="d3ed2a81-f46e-41ef-b7d5-ff4c300c066b" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Unit\bin\Debug\net8.0\Csharp.Api.Tests.Unit.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Unit.Services.TagPositionProcessorTests" name="ProcessAsync_ShouldUpdateBattery_WhenBatteryIsDifferent" />
+    </UnitTest>
+    <UnitTest name="Csharp.Api.Tests.Unit.Services.MotoServiceTests.CreateMotoAsync_ShouldThrow_WhenTagAlreadyExists" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.unit\bin\debug\net8.0\csharp.api.tests.unit.dll" id="cb233109-0a5b-1f89-efd0-355143dc385e">
+      <Execution id="29db6d9c-e021-434b-9e9a-99cfe443b7e4" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Unit\bin\Debug\net8.0\Csharp.Api.Tests.Unit.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Unit.Services.MotoServiceTests" name="CreateMotoAsync_ShouldThrow_WhenTagAlreadyExists" />
+    </UnitTest>
+    <UnitTest name="Csharp.Api.Tests.Unit.Services.MotoServiceTests.UpsertPorPlacaAsync_ShouldUpdateExistingMoto_WhenPlacaIsFound" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.unit\bin\debug\net8.0\csharp.api.tests.unit.dll" id="6fc2e574-a4e5-d38b-d162-3b1819b44e14">
+      <Execution id="48f3dd6f-fc65-4e89-ad20-5e945e418b06" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Unit\bin\Debug\net8.0\Csharp.Api.Tests.Unit.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Unit.Services.MotoServiceTests" name="UpsertPorPlacaAsync_ShouldUpdateExistingMoto_WhenPlacaIsFound" />
+    </UnitTest>
+    <UnitTest name="Csharp.Api.Tests.Unit.Services.TagPositionProcessorTests.ProcessAsync_ShouldOnlyUpdateTimestamp_WhenBeaconIsInSameZone" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.unit\bin\debug\net8.0\csharp.api.tests.unit.dll" id="326163e4-1da3-6393-d7e7-7cab5106671d">
+      <Execution id="1814d175-c8c8-4192-8561-43b07f186133" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Unit\bin\Debug\net8.0\Csharp.Api.Tests.Unit.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Unit.Services.TagPositionProcessorTests" name="ProcessAsync_ShouldOnlyUpdateTimestamp_WhenBeaconIsInSameZone" />
+    </UnitTest>
+    <UnitTest name="Csharp.Api.Tests.Unit.Services.MotoServiceTests.UpsertPorPlacaAsync_ShouldThrow_WhenTagIsAssignedToDifferentMoto" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.unit\bin\debug\net8.0\csharp.api.tests.unit.dll" id="3a189c2e-1a15-40ce-871d-e99cacd427e5">
+      <Execution id="a2d3136c-8d58-41af-8942-6ce70b0c1f89" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Unit\bin\Debug\net8.0\Csharp.Api.Tests.Unit.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Unit.Services.MotoServiceTests" name="UpsertPorPlacaAsync_ShouldThrow_WhenTagIsAssignedToDifferentMoto" />
+    </UnitTest>
+    <UnitTest name="Csharp.Api.Tests.Unit.Services.TagPositionProcessorTests.ProcessAsync_ShouldUpdateLocation_And_CreateNewHistory_WhenMotoMovesToNewZone" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.unit\bin\debug\net8.0\csharp.api.tests.unit.dll" id="9e030ab3-5135-fac6-4c79-67520a28be61">
+      <Execution id="e192056d-383e-4cf3-a67d-c46f645e462e" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Unit\bin\Debug\net8.0\Csharp.Api.Tests.Unit.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Unit.Services.TagPositionProcessorTests" name="ProcessAsync_ShouldUpdateLocation_And_CreateNewHistory_WhenMotoMovesToNewZone" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="6fc2e574-a4e5-d38b-d162-3b1819b44e14" executionId="48f3dd6f-fc65-4e89-ad20-5e945e418b06" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3f8d1d3d-07c4-6811-01d9-b6c21d2adba4" executionId="6bab26e1-5d44-4e56-845b-ae6f3c35f30d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f802efd6-4c56-cf9a-d6c0-e5a9f32ff922" executionId="d3ed2a81-f46e-41ef-b7d5-ff4c300c066b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cb233109-0a5b-1f89-efd0-355143dc385e" executionId="29db6d9c-e021-434b-9e9a-99cfe443b7e4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9e030ab3-5135-fac6-4c79-67520a28be61" executionId="e192056d-383e-4cf3-a67d-c46f645e462e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e662013-2663-8b4a-77d8-1e0d9a02ca1b" executionId="e35a1ce3-b0b9-479c-b9cf-0a5359624b76" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3a189c2e-1a15-40ce-871d-e99cacd427e5" executionId="a2d3136c-8d58-41af-8942-6ce70b0c1f89" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="326163e4-1da3-6393-d7e7-7cab5106671d" executionId="1814d175-c8c8-4192-8561-43b07f186133" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d1f3d5d-d9ca-9aa9-1d26-3e691174ae7c" executionId="b22aa7a0-3d7b-49e1-aaa5-d33e416dac25" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados que não estão em uma lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos os resultados carregados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="9" executed="9" passed="9" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.5.3.1+6b60a9e56a (64-bit .NET 8.0.18)&#xD;
+[xUnit.net 00:00:00.12]   Discovering: Csharp.Api.Tests.Unit&#xD;
+[xUnit.net 00:00:00.17]   Discovered:  Csharp.Api.Tests.Unit&#xD;
+[xUnit.net 00:00:00.17]   Starting:    Csharp.Api.Tests.Unit&#xD;
+[xUnit.net 00:00:01.49]   Finished:    Csharp.Api.Tests.Unit&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

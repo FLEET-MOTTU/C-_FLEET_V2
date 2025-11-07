@@ -1,4 +1,6 @@
 using Asp.Versioning;
+using ApiVersion = Asp.Versioning.ApiVersion;
+using ApiVersionAttribute = Asp.Versioning.ApiVersionAttribute;
 
 using System;
 using System.Threading.Tasks;
@@ -14,6 +16,7 @@ namespace Csharp.Api.Controllers
     /// Operações de pátio (classificação de lote em zonas).
     /// </summary>
     [ApiController]
+    [ApiVersion("1.0", Deprecated = true)]
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/patios")]
     [Authorize(Roles = "OPERACIONAL, ADMINISTRATIVO, TEMPORARIO")]

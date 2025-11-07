@@ -1,4 +1,6 @@
 using Asp.Versioning;
+using ApiVersion = Asp.Versioning.ApiVersion;
+using ApiVersionAttribute = Asp.Versioning.ApiVersionAttribute;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +17,7 @@ namespace Csharp.Api.Controllers
     /// Operações de leitura do Pátio (mapa, zonas) para o funcionário logado.
     /// </summary>
     [ApiController]
+    [ApiVersion("1.0", Deprecated = true)]
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/pateo")]
     [Authorize(Policy = "RolesOperacionais")]

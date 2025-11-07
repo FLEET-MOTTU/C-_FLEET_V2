@@ -1,4 +1,6 @@
 using Asp.Versioning;
+using ApiVersion = Asp.Versioning.ApiVersion;
+using ApiVersionAttribute = Asp.Versioning.ApiVersionAttribute;
 
 using System;
 using System.Threading.Tasks;
@@ -8,7 +10,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Csharp.Api.DTOs;
 using Csharp.Api.Services;
-using Csharp.Api.Enums;
+using Csharp.Api.ML.Models;
+using Csharp.Api.Entities.Enums;
 
 namespace Csharp.Api.Controllers
 {
@@ -16,19 +19,22 @@ namespace Csharp.Api.Controllers
     /// Operações de motos (CRUD + utilidades operacionais).
     /// </summary>
     [ApiController]
+    [ApiVersion("1.0", Deprecated = true)]
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/motos")]
     [Authorize(Policy = "RolesOperacionais")]
     [Produces("application/json")]
     public class MotosController : ControllerBase
     {
-        private readonly IMotoService _motoService;
-        private readonly ILogger<MotosController> _logger;
+    private readonly IMotoService _motoService;
+    private readonly ILogger<MotosController> _logger;
+    private readonly IPredictionService _predictionService;
 
-        public MotosController(IMotoService motoService, ILogger<MotosController> logger)
+        public MotosController(IMotoService motoService, IPredictionService predictionService, ILogger<MotosController> logger)
         {
             _motoService = motoService;
             _logger = logger;
+            _predictionService = predictionService;
         }
 
         /// <summary>Cria uma nova moto com tag associada.</summary>
@@ -142,5 +148,41 @@ namespace Csharp.Api.Controllers
             await _motoService.ReassignTagAsync(id, dto.CodigoUnicoTagNovo);
             return NoContent();
         }
+
+        /// <summary>
+        /// (ADMIN) Usa ML.NET para prever o tipo de reparo (Simples/Complexo) de uma moto.
+        /// </summary>
+        /// <remarks>
+        /// Este endpoint atende ao Requisito 4 (ML.NET). Ele usa um modelo de classificação binária
+        /// treinado para prever se, com base no modelo da moto, ela provavelmente
+        /// necessitará de reparos simples ou complexos.
+        /// </remarks>
+        /// <param name="id">O ID da moto (GUID) que está 'AguardandoVistoria'.</param>
+        /// <response code="200">Retorna a previsão do modelo.</response>
+        /// <response code="404">Moto não encontrada.</response>
+        [HttpGet("{id:guid}/prever-vistoria")]
+        [Authorize(Roles = "ADMINISTRATIVO, OPERACIONAL")]
+        [ProducesResponseType(typeof(VistoriaOutput), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PreverVistoria(Guid id)
+        {
+            var moto = await _motoService.GetMotoByIdAsync(id);
+            if (moto == null)
+            {
+                return NotFound(new { message = "Moto não encontrada." });
+            }
+
+            // MotoViewDto.Modelo is a string; convert to TipoModeloMoto enum before predicting.
+            if (!Enum.TryParse<TipoModeloMoto>(moto.Modelo, true, out var modeloEnum))
+            {
+                _logger.LogWarning("PreverVistoria: modelo da moto '{Modelo}' não corresponde a um TipoModeloMoto válido.", moto.Modelo);
+                return BadRequest(new { message = "Modelo da moto inválido para predição." });
+            }
+
+            var previsao = _predictionService.PreverVistoria(modeloEnum);
+            
+            return Ok(previsao);
+        }      
+    
     }
 }

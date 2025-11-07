@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="814f1fcd-9413-4a28-87e5-6203950c2f55" name="jou_tiago@DESKTOP-97890J2 2025-11-07 13:22:04" runUser="DESKTOP-97890J2\jou_tiago" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-11-07T13:22:04.0263315-03:00" queuing="2025-11-07T13:22:04.0263317-03:00" start="2025-11-07T13:22:00.4767228-03:00" finish="2025-11-07T13:22:04.0373139-03:00" />
+  <TestSettings name="default" id="8ba79a08-cbf7-40cf-8263-274a70b3d565">
+    <Deployment runDeploymentRoot="jou_tiago_DESKTOP-97890J2_2025-11-07_13_22_04" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="43ad219e-bd3e-4843-b5fa-4ae34eca6d36" testId="d9f23d33-8270-28cb-6228-51f74b3ab9ee" testName="Csharp.Api.Tests.Integration.MotosIntegrationTests.UpsertPorPlaca_CreateThenGetAndPredict_ShouldSucceed" computerName="DESKTOP-97890J2" duration="00:00:02.4506909" startTime="2025-11-07T13:22:03.9070736-03:00" endTime="2025-11-07T13:22:03.9070740-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="43ad219e-bd3e-4843-b5fa-4ae34eca6d36" />
+    <UnitTestResult executionId="0a1ed389-5fea-4fe8-8ea8-8103dd490b8a" testId="75410b00-d9a2-22ec-2793-80cf58ab141a" testName="Csharp.Api.Tests.Integration.HealthCheckTests.Get_HealthCheck_ShouldReturnOk" computerName="DESKTOP-97890J2" duration="00:00:02.0419310" startTime="2025-11-07T13:22:03.5044204-03:00" endTime="2025-11-07T13:22:03.5044493-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0a1ed389-5fea-4fe8-8ea8-8103dd490b8a" />
+    <UnitTestResult executionId="87b2312c-ca7f-4c84-865b-9e7db922febb" testId="56a47a9c-a0ef-024c-4b58-412c5e72ac17" testName="Csharp.Api.Tests.Integration.PateoTests.Get_MeuPateo_ShouldReturnOkAndContainZones" computerName="DESKTOP-97890J2" duration="00:00:02.2984741" startTime="2025-11-07T13:22:03.7550250-03:00" endTime="2025-11-07T13:22:03.7550253-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="87b2312c-ca7f-4c84-865b-9e7db922febb" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Csharp.Api.Tests.Integration.HealthCheckTests.Get_HealthCheck_ShouldReturnOk" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.integration\bin\debug\net8.0\csharp.api.tests.integration.dll" id="75410b00-d9a2-22ec-2793-80cf58ab141a">
+      <Execution id="0a1ed389-5fea-4fe8-8ea8-8103dd490b8a" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Integration\bin\Debug\net8.0\Csharp.Api.Tests.Integration.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Integration.HealthCheckTests" name="Get_HealthCheck_ShouldReturnOk" />
+    </UnitTest>
+    <UnitTest name="Csharp.Api.Tests.Integration.MotosIntegrationTests.UpsertPorPlaca_CreateThenGetAndPredict_ShouldSucceed" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.integration\bin\debug\net8.0\csharp.api.tests.integration.dll" id="d9f23d33-8270-28cb-6228-51f74b3ab9ee">
+      <Execution id="43ad219e-bd3e-4843-b5fa-4ae34eca6d36" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Integration\bin\Debug\net8.0\Csharp.Api.Tests.Integration.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Integration.MotosIntegrationTests" name="UpsertPorPlaca_CreateThenGetAndPredict_ShouldSucceed" />
+    </UnitTest>
+    <UnitTest name="Csharp.Api.Tests.Integration.PateoTests.Get_MeuPateo_ShouldReturnOkAndContainZones" storage="d:\dev\c#_fleet\c-_fleet_v2\csharp.api.tests.integration\bin\debug\net8.0\csharp.api.tests.integration.dll" id="56a47a9c-a0ef-024c-4b58-412c5e72ac17">
+      <Execution id="87b2312c-ca7f-4c84-865b-9e7db922febb" />
+      <TestMethod codeBase="d:\Dev\C#_fleet\C-_FLEET_V2\Csharp.Api.Tests.Integration\bin\Debug\net8.0\Csharp.Api.Tests.Integration.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Csharp.Api.Tests.Integration.PateoTests" name="Get_MeuPateo_ShouldReturnOkAndContainZones" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="d9f23d33-8270-28cb-6228-51f74b3ab9ee" executionId="43ad219e-bd3e-4843-b5fa-4ae34eca6d36" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="75410b00-d9a2-22ec-2793-80cf58ab141a" executionId="0a1ed389-5fea-4fe8-8ea8-8103dd490b8a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="56a47a9c-a0ef-024c-4b58-412c5e72ac17" executionId="87b2312c-ca7f-4c84-865b-9e7db922febb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados que não estão em uma lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos os resultados carregados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="3" executed="3" passed="3" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.5.3.1+6b60a9e56a (64-bit .NET 8.0.18)&#xD;
+[xUnit.net 00:00:00.14]   Discovering: Csharp.Api.Tests.Integration&#xD;
+[xUnit.net 00:00:00.21]   Discovered:  Csharp.Api.Tests.Integration&#xD;
+[xUnit.net 00:00:00.21]   Starting:    Csharp.Api.Tests.Integration&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 0 entities to in-memory store.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 0 entities to in-memory store.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 0 entities to in-memory store.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 4 entities to in-memory store.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 4 entities to in-memory store.&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 4 entities to in-memory store.&#xD;
+INFO: Verificando e aplicando migrations pendentes do EF Core...&#xD;
+INFO: Verificando e aplicando migrations pendentes do EF Core...&#xD;
+INFO: Verificando e aplicando migrations pendentes do EF Core...&#xD;
+INFO: Migrations aplicadas com sucesso (ou nenhuma pendente).&#xD;
+INFO: Migrations aplicadas com sucesso (ou nenhuma pendente).&#xD;
+INFO: Migrations aplicadas com sucesso (ou nenhuma pendente).&#xD;
+info: Csharp.Api.Services.PateoService[0]&#xD;
+      Buscando p�tio para o funcion�rio: 11987654331&#xD;
+info: Csharp.Api.Services.MotoService[0]&#xD;
+      UpsertPorPlaca: Placa=AAA1234, Tag=TAG-INT-01&#xD;
+info: Microsoft.EntityFrameworkCore.Update[30100]&#xD;
+      Saved 2 entities to in-memory store.&#xD;
+[xUnit.net 00:00:02.75]   Finished:    Csharp.Api.Tests.Integration&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

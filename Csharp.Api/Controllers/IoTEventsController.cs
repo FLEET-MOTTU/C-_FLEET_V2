@@ -1,4 +1,6 @@
 using Asp.Versioning;
+using ApiVersion = Asp.Versioning.ApiVersion;
+using ApiVersionAttribute = Asp.Versioning.ApiVersionAttribute;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -11,6 +13,7 @@ namespace Csharp.Api.Controllers
     /// Recebe eventos simulados de IoT (detecção de tag por beacon).
     /// </summary>
     [ApiController]
+    [ApiVersion("1.0", Deprecated = true)]
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/iot-events")]
     [Produces("application/json")]
