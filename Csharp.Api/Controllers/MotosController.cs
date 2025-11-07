@@ -1,3 +1,5 @@
+using Asp.Versioning;
+
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +16,8 @@ namespace Csharp.Api.Controllers
     /// Operações de motos (CRUD + utilidades operacionais).
     /// </summary>
     [ApiController]
-    [Route("api/motos")]
+    [ApiVersion("2.0")]
+    [Route("api/v{version:apiVersion}/motos")]
     [Authorize(Policy = "RolesOperacionais")]
     [Produces("application/json")]
     public class MotosController : ControllerBase

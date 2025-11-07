@@ -1,3 +1,5 @@
+using Asp.Versioning;
+
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +14,8 @@ namespace Csharp.Api.Controllers
     /// Operações de pátio (classificação de lote em zonas).
     /// </summary>
     [ApiController]
-    [Route("api/patios")]
+    [ApiVersion("2.0")]
+    [Route("api/v{version:apiVersion}/patios")]
     [Authorize(Roles = "OPERACIONAL, ADMINISTRATIVO, TEMPORARIO")]
     [Produces("application/json")]
     public class PatioOperacoesController : ControllerBase

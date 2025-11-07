@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,8 @@ namespace Csharp.Api.Controllers
     /// Recebe eventos simulados de IoT (detecção de tag por beacon).
     /// </summary>
     [ApiController]
-    [Route("api/iot-events")]
+    [ApiVersion("2.0")]
+    [Route("api/v{version:apiVersion}/iot-events")]
     [Produces("application/json")]
     public class IoTEventsController : ControllerBase
     {

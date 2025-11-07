@@ -1,3 +1,5 @@
+using Asp.Versioning;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -13,7 +15,8 @@ namespace Csharp.Api.Controllers
     /// Operações de leitura do Pátio (mapa, zonas) para o funcionário logado.
     /// </summary>
     [ApiController]
-    [Route("api/pateo")]
+    [ApiVersion("2.0")]
+    [Route("api/v{version:apiVersion}/pateo")]
     [Authorize(Policy = "RolesOperacionais")]
     [Produces("application/json")]
     public class PateoController : ControllerBase

@@ -1,10 +1,12 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using Asp.Versioning;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 using Oracle.EntityFrameworkCore.Storage.Internal;
 using Swashbuckle.AspNetCore.Filters;
@@ -60,6 +62,17 @@ builder.Services.AddHostedService<InterServiceSyncService>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
+
+builder.Services.AddHealthChecks()
+    .AddOracle(
+        connectionString: oracleConnectionString,
+        name: "Oracle DB (FIAP)",
+        failureStatus: HealthStatus.Degraded,
+        tags: new[] { "database", "ready" },
+        timeout: TimeSpan.FromSeconds(10)
+    );
+
+
 // ==================================================
 // 4️⃣ Controllers / JSON
 // ==================================================
@@ -68,6 +81,14 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(2, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+});
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -188,9 +209,14 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapHealthChecks("/health");
+
 app.Run();
+
+public partial class Program { }

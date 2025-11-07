@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Csharp.Api.DTOs;
 using Csharp.Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,8 @@ namespace Csharp.Api.Controllers
     /// CRUD de Beacons (gateways do pátio).
     /// </summary>
     [ApiController]
-    [Route("api/beacons")]
+    [ApiVersion("2.0")]
+    [Route("api/v{version:apiVersion}/beacons")]
     [Produces("application/json")]
     public class BeaconsController : ControllerBase
     {
