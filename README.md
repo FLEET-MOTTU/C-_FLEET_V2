@@ -140,3 +140,10 @@ A API agora implementa um **CRUD completo** para as entidades `Moto` (junto de s
     - JOURNEY TIAGO LOPES – RM 556071
 
     --
+
+    ## OPCIONAL
+
+    Caso a api não rode localmente por quaisquer motivos ela está hospedada na Azure Cloud e é acessível através da URL:
+
+    [Link]http://mottu-csharp-api-tiago.westus2.azurecontainer.io/swagger/index.html
+
