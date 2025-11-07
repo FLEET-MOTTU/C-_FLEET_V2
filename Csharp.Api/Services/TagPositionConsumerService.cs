@@ -9,6 +9,10 @@ using Microsoft.Extensions.Logging;
 namespace Csharp.Api.Services
 {
     /// <summary>Consumer da fila de posicionamento; delega ao ITagPositionProcessor.</summary>
+    /// <summary>
+    /// Serviço hospedado responsável por consumir eventos de posição de tags (background worker).
+    /// Executa leitura de filas e invoca o processador de posição conforme necessário.
+    /// </summary>
     public class TagPositionConsumerService : IHostedService
     {
         private readonly ILogger<TagPositionConsumerService> _logger;
@@ -39,7 +43,12 @@ namespace Csharp.Api.Services
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+    /// <summary>
+    /// Inicializa o serviço hospedado de consumo de eventos de posição.
+    /// Normalmente inicia listeners/consumidores de fila.
+    /// </summary>
+    /// <param name="cancellationToken">Token de cancelamento.</param>
+    public async Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Iniciando TagPositionConsumerService...");
             _processor.ProcessMessageAsync += HandleMessageAsync;
@@ -47,7 +56,11 @@ namespace Csharp.Api.Services
             await _processor.StartProcessingAsync(cancellationToken);
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+    /// <summary>
+    /// Encerra o serviço hospedado de consumo, liberando recursos e finalizando listeners.
+    /// </summary>
+    /// <param name="cancellationToken">Token de cancelamento.</param>
+    public async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Encerrando TagPositionConsumerService...");
             await _processor.StopProcessingAsync(cancellationToken);

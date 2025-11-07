@@ -10,6 +10,10 @@ namespace Csharp.Api.Services
         VistoriaOutput PreverVistoria(TipoModeloMoto modelo);
     }
 
+    /// <summary>
+    /// Serviço de predição que encapsula a lógica de inferência usando o modelo ML embarcado.
+    /// Fornece métodos para executar previsões a partir do modelo treinado.
+    /// </summary>
     public class PredictionService : IPredictionService
     {
         private readonly PredictionEnginePool<VistoriaInput, VistoriaOutput> _pool;

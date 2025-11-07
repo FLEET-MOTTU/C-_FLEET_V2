@@ -9,6 +9,10 @@ namespace Csharp.Api.Services
     /// <summary>
     /// Aplica a movimentação de zona/histórico com base no beacon detectado.
     /// </summary>
+    /// <summary>
+    /// Processador responsável por regras que tratam atualizações de posição de tags (posição e zona).
+    /// Utilizado internamente para aplicar lógica de negócio e atualização do estado das motos.
+    /// </summary>
     public class TagPositionProcessor : ITagPositionProcessor
     {
         private readonly AppDbContext _context;
@@ -20,7 +24,11 @@ namespace Csharp.Api.Services
             _logger = logger;
         }
 
-        public async Task ProcessAsync(TagInteractionEventDto eventoDto)
+    /// <summary>
+    /// Processa a atualização de posição de uma tag (determina zona e atualiza estado da moto).
+    /// </summary>
+    /// <param name="eventoDto">Evento de interação da tag com informações de beacon/zona.</param>
+    public async Task ProcessAsync(TagInteractionEventDto eventoDto)
         {
             var tagCodigo = eventoDto.CodigoUnicoTag?.ToUpperInvariant();
             var beaconId  = eventoDto.BeaconIdDetectado?.ToUpperInvariant();

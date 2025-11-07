@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Csharp.Api.Entities
 {
     /// <summary>
-    /// Pátio (réplica de fonte Java). Não altere schema/colunas daqui.
+    /// Representa um pátio com seus metadados e navegações para zonas e funcionários.
     /// </summary>
     [Table("PATEOS_SYNC")]
     public class Pateo
@@ -38,8 +38,7 @@ namespace Csharp.Api.Entities
         [Column("CREATED_AT")]
         public DateTime CreatedAt { get; set; }
 
-        // Navegações (lado C#)
-        public virtual ICollection<Funcionario> Funcionarios { get; set; } = new List<Funcionario>();
-        public virtual ICollection<Zona> Zonas { get; set; } = new List<Zona>();
+    public virtual ICollection<Funcionario> Funcionarios { get; set; } = new List<Funcionario>();
+    public virtual ICollection<Zona> Zonas { get; set; } = new List<Zona>();
     }
 }

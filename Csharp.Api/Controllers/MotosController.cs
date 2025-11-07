@@ -37,7 +37,11 @@ namespace Csharp.Api.Controllers
             _predictionService = predictionService;
         }
 
-        /// <summary>Cria uma nova moto com tag associada.</summary>
+    /// <summary>
+    /// Cria uma nova moto com tag associada.
+    /// </summary>
+    /// <param name="createMotoDto">Dados para criação da moto.</param>
+    /// <returns>201 Created com o <see cref="MotoViewDto"/> criado.</returns>
         [HttpPost]
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -54,7 +58,14 @@ namespace Csharp.Api.Controllers
             return CreatedAtAction(nameof(GetMotoById), new { id = motoCriada.Id }, motoCriada);
         }
 
-        /// <summary>Lista motos com filtros e paginação.</summary>
+    /// <summary>
+    /// Lista motos com filtros opcionais e paginação.
+    /// </summary>
+    /// <param name="status">Filtro por status da moto.</param>
+    /// <param name="placa">Filtro por placa.</param>
+    /// <param name="page">Número da página (padrão 1).</param>
+    /// <param name="pageSize">Tamanho da página (padrão 10).</param>
+    /// <returns>200 OK com paginação de <see cref="MotoViewDto"/>.</returns>
         [HttpGet]
         [ProducesResponseType(typeof(PaginatedResponseDto<MotoViewDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -68,7 +79,11 @@ namespace Csharp.Api.Controllers
             return Ok(motos);
         }
 
-        /// <summary>Obtém moto por ID.</summary>
+    /// <summary>
+    /// Obtém uma moto pelo seu identificador.
+    /// </summary>
+    /// <param name="id">ID da moto.</param>
+    /// <returns>200 OK com <see cref="MotoViewDto"/> ou 404 se não existir.</returns>
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -78,7 +93,11 @@ namespace Csharp.Api.Controllers
             return Ok(moto);
         }
 
-        /// <summary>Obtém moto por placa.</summary>
+    /// <summary>
+    /// Obtém uma moto pela placa informada.
+    /// </summary>
+    /// <param name="placa">Placa a consultar.</param>
+    /// <returns>200 OK com <see cref="MotoViewDto"/> ou 404 se não encontrada.</returns>
         [HttpGet("por-placa/{placa}")]
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -89,7 +108,12 @@ namespace Csharp.Api.Controllers
             return Ok(moto);
         }
 
-        /// <summary>Atualiza moto.</summary>
+    /// <summary>
+    /// Atualiza os dados principais de uma moto.
+    /// </summary>
+    /// <param name="id">ID da moto a atualizar.</param>
+    /// <param name="updateMotoDto">Dados de atualização.</param>
+    /// <returns>200 OK com o <see cref="MotoViewDto"/> atualizado.</returns>
         [HttpPut("{id:guid}")]
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -107,7 +131,11 @@ namespace Csharp.Api.Controllers
             return Ok(motoAtualizadaDto);
         }
 
-        /// <summary>Exclui moto (e a tag associada).</summary>
+    /// <summary>
+    /// Exclui uma moto e a associação da tag.
+    /// </summary>
+    /// <param name="id">ID da moto a excluir.</param>
+    /// <returns>204 No Content se removida com sucesso.</returns>
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -119,9 +147,11 @@ namespace Csharp.Api.Controllers
 
         // ----------- Utilidades Operacionais -----------
 
-        /// <summary>
-        /// Upsert por placa: cria/atualiza e garante vínculo com a Tag e (opcional) Zona.
-        /// </summary>
+    /// <summary>
+    /// Cria ou atualiza uma moto com base na placa (upsert) e garante vínculo com a tag.
+    /// </summary>
+    /// <param name="dto">DTO contendo placa, modelo, status, tag e zona opcional.</param>
+    /// <returns>200 OK com o <see cref="MotoViewDto"/> resultante.</returns>
         [HttpPost("upsert-por-placa")]
         [ProducesResponseType(typeof(MotoViewDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -134,9 +164,12 @@ namespace Csharp.Api.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Reatribui a Tag de uma moto (substituição de tag).
-        /// </summary>
+    /// <summary>
+    /// Reatribui a tag de uma moto existente.
+    /// </summary>
+    /// <param name="id">ID da moto.</param>
+    /// <param name="dto">DTO com o novo código de tag.</param>
+    /// <returns>204 No Content em sucesso.</returns>
         [HttpPut("{id:guid}/reassign-tag")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -149,9 +182,9 @@ namespace Csharp.Api.Controllers
             return NoContent();
         }
 
-        /// <summary>
-        /// (ADMIN) Usa ML.NET para prever o tipo de reparo (Simples/Complexo) de uma moto.
-        /// </summary>
+    /// <summary>
+    /// (ADMIN) Usa ML.NET para prever o tipo de vistoria/reparo de uma moto.
+    /// </summary>
         /// <remarks>
         /// Este endpoint atende ao Requisito 4 (ML.NET). Ele usa um modelo de classificação binária
         /// treinado para prever se, com base no modelo da moto, ela provavelmente

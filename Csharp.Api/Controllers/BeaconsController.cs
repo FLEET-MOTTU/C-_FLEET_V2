@@ -25,7 +25,11 @@ namespace Csharp.Api.Controllers
             _beaconService = beaconService;
         }
 
-        /// <summary>Cria um novo beacon.</summary>
+    /// <summary>
+    /// Cria um novo beacon (gateway do pátio).
+    /// </summary>
+    /// <param name="createBeaconDto">Dados necessários para criar o beacon.</param>
+    /// <returns>201 Created com o <see cref="BeaconDto"/> criado.</returns>
         [HttpPost]
         [ProducesResponseType(typeof(BeaconDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -38,7 +42,12 @@ namespace Csharp.Api.Controllers
             return CreatedAtAction(nameof(GetBeaconById), new { id = beacon.Id }, beacon);
         }
 
-        /// <summary>Lista beacons com paginação.</summary>
+    /// <summary>
+    /// Lista todos os beacons com paginação.
+    /// </summary>
+    /// <param name="page">Número da página (padrão 1).</param>
+    /// <param name="pageSize">Tamanho da página (padrão 10).</param>
+    /// <returns>200 OK com uma página de <see cref="BeaconDto"/>.</returns>
         [HttpGet]
         [ProducesResponseType(typeof(PaginatedResponseDto<BeaconDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllBeacons([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
@@ -47,7 +56,11 @@ namespace Csharp.Api.Controllers
             return Ok(beacons);
         }
 
-        /// <summary>Obtém beacon por ID.</summary>
+    /// <summary>
+    /// Obtém um beacon pelo seu identificador único (GUID).
+    /// </summary>
+    /// <param name="id">ID do beacon.</param>
+    /// <returns>200 OK com o <see cref="BeaconDto"/> ou 404 se não existir.</returns>
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(BeaconDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -57,7 +70,11 @@ namespace Csharp.Api.Controllers
             return Ok(beacon);
         }
 
-        /// <summary>Obtém beacon por BeaconId (identificador lógico).</summary>
+    /// <summary>
+    /// Obtém um beacon pelo seu identificador lógico (BeaconId).
+    /// </summary>
+    /// <param name="beaconId">Identificador lógico do beacon.</param>
+    /// <returns>200 OK com o <see cref="BeaconDto"/> ou 404 se não encontrado.</returns>
         [HttpGet("by-beaconid/{beaconId}")]
         [ProducesResponseType(typeof(BeaconDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -68,7 +85,12 @@ namespace Csharp.Api.Controllers
             return Ok(beacon);
         }
 
-        /// <summary>Atualiza um beacon.</summary>
+    /// <summary>
+    /// Atualiza os dados de um beacon existente.
+    /// </summary>
+    /// <param name="id">ID do beacon a ser atualizado.</param>
+    /// <param name="updateBeaconDto">Dados para atualização.</param>
+    /// <returns>200 OK com o <see cref="BeaconDto"/> atualizado.</returns>
         [HttpPut("{id:guid}")]
         [ProducesResponseType(typeof(BeaconDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -81,7 +103,11 @@ namespace Csharp.Api.Controllers
             return Ok(beacon);
         }
 
-        /// <summary>Remove um beacon.</summary>
+    /// <summary>
+    /// Remove um beacon do sistema.
+    /// </summary>
+    /// <param name="id">ID do beacon a remover.</param>
+    /// <returns>204 No Content em caso de sucesso.</returns>
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

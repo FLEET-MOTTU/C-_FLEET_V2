@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace Csharp.Api.Services
 {
+    /// <summary>
+    /// Implementação do serviço de Pátio.
+    /// Responsável por operações de leitura e lógica de domínio relacionadas ao pátio e suas zonas.
+    /// </summary>
     public class PateoService : IPateoService
     {
         private readonly AppDbContext _context;
@@ -22,7 +26,12 @@ namespace Csharp.Api.Services
             _logger = logger;
         }
 
-        public async Task<PateoDetailDto> GetMyPateoAsync(string funcionarioTelefone)
+    /// <summary>
+    /// Retorna os detalhes do pátio associado ao funcionário (identificado por telefone).
+    /// </summary>
+    /// <param name="funcionarioTelefone">Telefone do funcionário (claim).</param>
+    /// <returns>Detalhes do pátio.</returns>
+    public async Task<PateoDetailDto> GetMyPateoAsync(string funcionarioTelefone)
         {
             _logger.LogInformation("Buscando pátio para o funcionário: {Telefone}", funcionarioTelefone);
 

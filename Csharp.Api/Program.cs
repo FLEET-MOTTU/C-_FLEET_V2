@@ -29,18 +29,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.AddConsole();
 
-// ==================================================
-// 1️⃣ Configuração (JSON + variáveis de ambiente)
-// ==================================================
+// Configuração: carregamento de appsettings.json e variáveis de ambiente
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddEnvironmentVariables(); // <-- lê .env (via Docker)
+    .AddEnvironmentVariables();
 
 
-// ==================================================
-// 2️⃣ Banco de Dados (Oracle)
-// ==================================================
+// Banco de dados (Oracle)
 var oracleConnectionString =
     builder.Configuration.GetConnectionString("OracleConnection")
     ?? builder.Configuration["ConnectionStrings:OracleConnection"];
@@ -60,9 +56,7 @@ if (!builder.Environment.IsEnvironment("Testing"))
     );
 }
 
-// ==================================================
-// 3️⃣ Injeção de Dependências
-// ==================================================
+// Registro de dependências (serviços, ML, hosted services)
 builder.Services.AddScoped<IMotoService, MotoService>();
 builder.Services.AddScoped<IIoTEventService, IoTEventService>();
 builder.Services.AddScoped<IBeaconService, BeaconService>();
@@ -79,9 +73,7 @@ builder.Services.AddHostedService<InterServiceSyncService>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
-// ==================================================
-// 4️⃣ Controllers & API Configuration
-// ==================================================
+// Controladores e opções de serialização
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -92,9 +84,7 @@ builder.Services.AddControllers()
 // Configure API versioning and API Explorer
 builder.Services.AddEndpointsApiExplorer();
 
-// ==================================================
-// ✅ API Versioning + Explorer (config oficial Asp.Versioning 8.x)
-// ==================================================
+// API Versioning + ApiExplorer (Asp.Versioning)
 builder.Services
     .AddApiVersioning(options =>
     {
@@ -114,9 +104,7 @@ builder.Services
 
 
 
-// ==================================================
-// 5️⃣ Swagger Configuration
-// ==================================================
+// Swagger / OpenAPI
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -173,9 +161,7 @@ else
     builder.Services.AddHealthChecks();
 }
 
-// ==================================================
-// 6️⃣ Auth (JWT)
-// ==================================================
+// Autenticação e autorização (JWT)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RolesOperacionais", policy =>
@@ -214,9 +200,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ==================================================
-// 7️⃣ Pipeline / Execução
-// ==================================================
+// Pipeline e execução
 var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();

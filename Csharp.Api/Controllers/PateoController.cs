@@ -31,11 +31,11 @@ namespace Csharp.Api.Controllers
             _pateoService = pateoService;
         }
 
-        /// <summary>
-        /// Obtém os detalhes do pátio (planta e zonas) ao qual o funcionário logado pertence.
-        /// </summary>
-        /// <response code="200">Retorna os detalhes do pátio.</response>
-        /// <response code="404">Funcionário ou Pátio associado não encontrado (erro de sync).</response>
+    /// <summary>
+    /// Obtém os detalhes do pátio (planta e zonas) associado ao funcionário logado.
+    /// </summary>
+    /// <returns>200 OK com <see cref="PateoDetailDto"/> contendo planta e zonas do pátio.</returns>
+    /// <response code="404">Funcionário ou pátio associado não encontrado (erro de sincronização).</response>
         [HttpGet("meu-pateo")]
         [ProducesResponseType(typeof(PateoDetailDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

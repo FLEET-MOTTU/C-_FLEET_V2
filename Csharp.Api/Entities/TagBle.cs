@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Csharp.Api.Entities
 {
     /// <summary>
-    /// Tag BLE física colada na moto. É a referência de telemetria.
+    /// Tag BLE física afixada à moto; referência primária de telemetria e associação com a entidade <see cref="Moto"/>.
     /// </summary>
     [Index(nameof(CodigoUnicoTag), IsUnique = true)]
     public class TagBle
@@ -21,9 +21,6 @@ namespace Csharp.Api.Entities
         [Range(0, 100, ErrorMessage = "Nível da bateria deve ser entre 0 e 100.")]
         public int NivelBateria { get; set; }
 
-        /// <summary>
-        /// Navegação 1-1 (inversa): EF garantirá FK em Moto.TagBleId.
-        /// </summary>
-        public virtual Moto? Moto { get; set; }
+    public virtual Moto? Moto { get; set; }
     }
 }

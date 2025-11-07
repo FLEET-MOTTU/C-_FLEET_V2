@@ -9,6 +9,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Csharp.Api.Services
 {
+    /// <summary>
+    /// Implementação do serviço de motos.
+    /// Contém regras de negócio e operações para criação, atualização, consulta e remoção de motos.
+    /// </summary>
     public class MotoService : IMotoService
     {
         private readonly AppDbContext _context;
@@ -22,7 +26,12 @@ namespace Csharp.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<MotoViewDto> CreateMotoAsync(CreateMotoDto createMotoDto)
+    /// <summary>
+    /// Cria uma nova moto com a tag associada.
+    /// </summary>
+    /// <param name="createMotoDto">Dados necessários para criação.</param>
+    /// <returns>Representação da moto criada.</returns>
+    public async Task<MotoViewDto> CreateMotoAsync(CreateMotoDto createMotoDto)
         {
             var placaUpper = string.IsNullOrWhiteSpace(createMotoDto.Placa) ? null : createMotoDto.Placa.ToUpperInvariant();
             var tagCodeUpper = createMotoDto.CodigoUnicoTagParaNovaTag.ToUpperInvariant();
@@ -72,7 +81,15 @@ namespace Csharp.Api.Services
             }
         }
 
-        public async Task<PaginatedResponseDto<MotoViewDto>> GetAllMotosAsync(string? status, string? placa, int page, int pageSize)
+    /// <summary>
+    /// Obtém motos paginadas com filtros opcionais.
+    /// </summary>
+    /// <param name="status">Filtro por status da moto.</param>
+    /// <param name="placa">Filtro por placa.</param>
+    /// <param name="page">Número da página (1-based).</param>
+    /// <param name="pageSize">Tamanho da página.</param>
+    /// <returns>Resposta paginada com <see cref="MotoViewDto"/>.</returns>
+    public async Task<PaginatedResponseDto<MotoViewDto>> GetAllMotosAsync(string? status, string? placa, int page, int pageSize)
         {
             if (page < 1 || pageSize < 1)
                 throw new EntradaInvalidaException("Os parâmetros 'page' e 'pageSize' devem ser maiores que zero.");
@@ -121,7 +138,12 @@ namespace Csharp.Api.Services
             };
         }
 
-        public async Task<MotoViewDto?> GetMotoByIdAsync(Guid id)
+    /// <summary>
+    /// Recupera uma moto por seu identificador.
+    /// </summary>
+    /// <param name="id">ID da moto.</param>
+    /// <returns>DTO da moto ou null se não encontrada.</returns>
+    public async Task<MotoViewDto?> GetMotoByIdAsync(Guid id)
         {
             var moto = await _context.Motos.AsNoTracking()
                 .Include(m => m.Tag)
@@ -131,7 +153,12 @@ namespace Csharp.Api.Services
             return _mapper.Map<MotoViewDto>(moto);
         }
 
-        public async Task<MotoViewDto?> GetMotoByPlacaAsync(string placa)
+    /// <summary>
+    /// Recupera uma moto pela placa.
+    /// </summary>
+    /// <param name="placa">Placa da moto.</param>
+    /// <returns>DTO da moto ou null se não encontrada.</returns>
+    public async Task<MotoViewDto?> GetMotoByPlacaAsync(string placa)
         {
             if (string.IsNullOrWhiteSpace(placa))
                 throw new EntradaInvalidaException(nameof(placa), "A placa não pode ser vazia.");
@@ -145,7 +172,13 @@ namespace Csharp.Api.Services
             return _mapper.Map<MotoViewDto>(moto);
         }
 
-        public async Task<MotoViewDto> UpdateMotoAsync(Guid id, UpdateMotoDto updateMotoDto)
+    /// <summary>
+    /// Atualiza os dados de uma moto existente.
+    /// </summary>
+    /// <param name="id">Identificador da moto.</param>
+    /// <param name="updateMotoDto">Dados de atualização.</param>
+    /// <returns>DTO da moto atualizada.</returns>
+    public async Task<MotoViewDto> UpdateMotoAsync(Guid id, UpdateMotoDto updateMotoDto)
         {
             var moto = await _context.Motos.Include(m => m.Tag).FirstOrDefaultAsync(m => m.Id == id);
             if (moto == null) throw new MotoNotFoundException(id);
@@ -176,7 +209,12 @@ namespace Csharp.Api.Services
             }
         }
 
-        public async Task<bool> DeleteMotoAsync(Guid id)
+    /// <summary>
+    /// Remove uma moto do sistema.
+    /// </summary>
+    /// <param name="id">Identificador da moto.</param>
+    /// <returns>True se removida com sucesso, caso contrário false.</returns>
+    public async Task<bool> DeleteMotoAsync(Guid id)
         {
             var moto = await _context.Motos.Include(m => m.Tag).FirstOrDefaultAsync(m => m.Id == id);
             if (moto == null) throw new MotoNotFoundException(id);
@@ -188,7 +226,16 @@ namespace Csharp.Api.Services
             return true;
         }
 
-        public async Task<MotoViewDto> UpsertPorPlacaAsync(string? placa, TipoModeloMoto modelo, TipoStatusMoto status, string codigoTag, Guid? zonaId = null)
+    /// <summary>
+    /// Insere ou atualiza uma moto com base na placa. Se a placa existir, atualiza; caso contrário, cria.
+    /// </summary>
+    /// <param name="placa">Placa (pode ser nula para criação por tag apenas).</param>
+    /// <param name="modelo">Modelo da moto.</param>
+    /// <param name="status">Status inicial da moto.</param>
+    /// <param name="codigoTag">Código único da tag BLE.</param>
+    /// <param name="zonaId">Zona opcional.</param>
+    /// <returns>DTO da moto criada ou atualizada.</returns>
+    public async Task<MotoViewDto> UpsertPorPlacaAsync(string? placa, TipoModeloMoto modelo, TipoStatusMoto status, string codigoTag, Guid? zonaId = null)
         {
             var placaUpper   = string.IsNullOrWhiteSpace(placa) ? null : placa.ToUpperInvariant();
             var tagCodeUpper = codigoTag.ToUpperInvariant();
@@ -245,7 +292,12 @@ namespace Csharp.Api.Services
             return _mapper.Map<MotoViewDto>(moto);
         }
 
-        public async Task ReassignTagAsync(Guid motoId, string codigoTagNovo)
+    /// <summary>
+    /// Reatribui uma nova tag a uma moto existente.
+    /// </summary>
+    /// <param name="motoId">ID da moto.</param>
+    /// <param name="codigoTagNovo">Código da nova tag.</param>
+    public async Task ReassignTagAsync(Guid motoId, string codigoTagNovo)
         {
             var tagCodeUpper = codigoTagNovo.ToUpperInvariant();
             _logger.LogInformation("ReassignTag: Moto={MotoId}, TagNova={Tag}", motoId, tagCodeUpper);

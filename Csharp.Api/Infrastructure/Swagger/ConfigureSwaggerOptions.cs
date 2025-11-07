@@ -30,7 +30,7 @@ namespace Csharp.Api.Infrastructure.Swagger
 
                 if (description.IsDeprecated)
                 {
-                    info.Description += " ⚠️ Esta versão está depreciada.";
+                    info.Description += " Esta versão está depreciada.";
                 }
 
                 options.SwaggerDoc(description.GroupName, info);

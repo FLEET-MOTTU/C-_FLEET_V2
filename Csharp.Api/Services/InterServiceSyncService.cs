@@ -14,6 +14,10 @@ namespace Csharp.Api.Services
     /// <summary>
     /// Consome fila de sync (Java → C#) e replica Pátio/Zona/Funcionário.
     /// </summary>
+    /// <summary>
+    /// Serviço hospedado que realiza sincronização periódica entre sistemas (integração com outros serviços).
+    /// Utilizado para manter entidades sincronizadas entre sistemas externos e este contexto.
+    /// </summary>
     public class InterServiceSyncService : IHostedService
     {
         private readonly ILogger<InterServiceSyncService> _logger;
@@ -44,7 +48,12 @@ namespace Csharp.Api.Services
             _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+    /// <summary>
+    /// Inicializa a rotina de sincronização entre serviços.
+    /// Executado quando o host sobe; agenda tarefas periódicas conforme configuração.
+    /// </summary>
+    /// <param name="cancellationToken">Token de cancelamento.</param>
+    public async Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Iniciando InterServiceSyncService...");
             _processor.ProcessMessageAsync += HandleMessageAsync;
@@ -52,7 +61,11 @@ namespace Csharp.Api.Services
             await _processor.StartProcessingAsync(cancellationToken);
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+    /// <summary>
+    /// Encerra a rotina de sincronização e limpa recursos alocados.
+    /// </summary>
+    /// <param name="cancellationToken">Token de cancelamento.</param>
+    public async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Encerrando InterServiceSyncService...");
             await _processor.StopProcessingAsync(cancellationToken);

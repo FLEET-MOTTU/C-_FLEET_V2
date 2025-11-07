@@ -10,7 +10,7 @@ namespace Csharp.Api.Infrastructure.Swagger
 {
     /// <summary>
     /// Aplica valores padrão às operações do Swagger.
-    /// Necessário para integração com API Versioning (Asp.Versioning 8.x).
+    /// Compatibiliza informações do ApiExplorer com as operações geradas pelo Swagger.
     /// </summary>
     public class SwaggerDefaultValues : IOperationFilter
     {
@@ -18,11 +18,11 @@ namespace Csharp.Api.Infrastructure.Swagger
         {
             var apiDescription = context.ApiDescription;
 
-            // Obtém os metadados da versão da API
+            // Obtém metadados de versão associados à ação
             var metadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();
             var model = metadata.Map(ApiVersionMapping.Explicit | ApiVersionMapping.Implicit);
 
-            // --- 🔹 Detecta se a versão atual do documento é depreciada ---
+            // Detecta se a versão corrente do documento está marcada como depreciada
             if (model.DeprecatedApiVersions.Any())
             {
                 var group = apiDescription.GroupName;
@@ -36,13 +36,11 @@ namespace Csharp.Api.Infrastructure.Swagger
                         .Any(v => string.Equals(v.ToString(), versionText, StringComparison.OrdinalIgnoreCase));
 
                     if (isDeprecated)
-                    {
                         operation.Deprecated = true;
-                    }
                 }
             }
 
-            // --- 🔹 Ajusta descrições de parâmetros (Swagger UI) ---
+            // Ajusta descrições de parâmetros usando metadados do ApiExplorer
             if (operation.Parameters == null)
                 return;
 

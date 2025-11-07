@@ -1,8 +1,6 @@
 namespace Csharp.Api.Entities.Enums
 {
-    /// <summary>
-    /// Estados de ciclo de vida e operação da moto (coleta, pátio e externos).
-    /// </summary>
+    /// <summary> Estados de ciclo de vida e operação da moto (coleta, pátio e externos).</summary>
     public enum TipoStatusMoto
     {
         // Coleta

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Csharp.Api.Entities
 {
     /// <summary>
-    /// Zona física do pátio (réplica de fonte Java). Polígono salvo como WKT.
+    /// Zona física do pátio. Coordenadas armazenadas em WKT (geometria como texto).
     /// </summary>
     [Table("ZONAS_SYNC")]
     public class Zona

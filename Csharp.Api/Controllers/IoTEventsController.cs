@@ -28,9 +28,12 @@ namespace Csharp.Api.Controllers
             _logger = logger;
         }
 
-        /// <summary>Processa evento de interação de uma tag BLE.</summary>
-        /// <response code="202">Evento aceito.</response>
-        /// <response code="400">Payload inválido.</response>
+    /// <summary>
+    /// Processa um evento de interação de uma tag BLE detectada por um beacon.
+    /// </summary>
+    /// <param name="eventoDto">Dados do evento de interação (tag, beacon, timestamp, RSSI).</param>
+    /// <returns>202 Accepted quando o evento foi aceito para processamento assíncrono.</returns>
+    /// <response code="400">Retorna 400 quando o payload é inválido.</response>
         [HttpPost("tag-interaction")]
         [ProducesResponseType(typeof(object), StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

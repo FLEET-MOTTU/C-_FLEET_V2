@@ -21,10 +21,9 @@ namespace Csharp.Api.Tests.Integration
             // O sub (NameIdentifier) é o telefone como no Java
             var claims = new List<Claim>
             {
-                // NameIdentifier remains an example value; Name should be the telefone used in seeded data
                 new Claim(ClaimTypes.NameIdentifier, "123456789"),
                 new Claim(ClaimTypes.Role, "OPERACIONAL"),
-                new Claim(ClaimTypes.Name, "11987654331"), // matches seeded Funcionario.Telefone
+                new Claim(ClaimTypes.Name, "11987654331"),
             };
             
             var identity = new ClaimsIdentity(claims, "Test");

@@ -4,6 +4,10 @@ using Csharp.Api.Entities;
 
 namespace Csharp.Api.Data
 {
+    /// <summary>
+    /// Contexto EF Core da aplicação.
+    /// Define DbSet para entidades do domínio e configurações de mapeamento.
+    /// </summary>
     public class AppDbContext : DbContext
     {
         public DbSet<Moto> Motos { get; set; }
@@ -37,7 +41,7 @@ namespace Csharp.Api.Data
                 .HasIndex(b => b.BeaconId)
                 .IsUnique();
 
-            // Opcional: relação beacon -> zona (nullable)
+            // relação beacon -> zona (nullable)
             modelBuilder.Entity<Beacon>()
                 .HasOne(b => b.Zona)
                 .WithMany()
@@ -65,7 +69,7 @@ namespace Csharp.Api.Data
                 .IsUnique()
                 .HasFilter("\"Placa\" IS NOT NULL");
 
-            // Opcional: relação moto -> zona (nullable)
+            // relação moto -> zona (nullable)
             modelBuilder.Entity<Moto>()
                 .HasOne(m => m.Zona)
                 .WithMany()
@@ -108,7 +112,7 @@ namespace Csharp.Api.Data
                       .HasForeignKey(z => z.PateoId);
             });
 
-            // --------- Tabelas internas do C# ---------
+            // Tabelas internas do C#
 
             // ZonaRegraStatus
             modelBuilder.Entity<ZonaRegraStatus>(entity =>

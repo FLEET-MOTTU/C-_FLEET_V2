@@ -5,6 +5,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Csharp.Api.Services
 {
+    /// <summary>
+    /// Implementação do serviço de classificação de lotes.
+    /// Encapsula regras que sugerem zonas e classificam motos conforme regras do pátio.
+    /// </summary>
     public class ClassificationService : IClassificationService
     {
         private readonly AppDbContext _context;
@@ -16,7 +20,12 @@ namespace Csharp.Api.Services
             _logger = logger;
         }
 
-        public async Task<LoteClassificacaoRespostaDto> SugerirZonasPorEstadoAsync(LoteClassificacaoRequestDto request)
+    /// <summary>
+    /// Analisa um lote de motos e sugere zonas para cada item conforme regras configuradas.
+    /// </summary>
+    /// <param name="request">Dados de entrada contendo motos e contexto do pátio.</param>
+    /// <returns>Resposta com sugestões de zonas e classificação.</returns>
+    public async Task<LoteClassificacaoRespostaDto> SugerirZonasPorEstadoAsync(LoteClassificacaoRequestDto request)
         {
             var resposta = new LoteClassificacaoRespostaDto { PateoId = request.PateoId };
 

@@ -63,7 +63,6 @@ namespace Csharp.Api.Tests.Integration
                 throw new Xunit.Sdk.XunitException($"Predict failed: {(int)predResp.StatusCode} - {txt}");
             }
             var pred = await predResp.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
-            // "precisaReparoComplexo" may be a boolean; verify the property exists and read its value kind
             Assert.True(pred.TryGetProperty("precisaReparoComplexo", out var prop), "Response missing 'precisaReparoComplexo' property");
             Assert.True(prop.ValueKind == System.Text.Json.JsonValueKind.True || prop.ValueKind == System.Text.Json.JsonValueKind.False || prop.ValueKind == System.Text.Json.JsonValueKind.Null);
         }

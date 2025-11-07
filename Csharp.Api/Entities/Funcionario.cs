@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Csharp.Api.Entities
 {
     /// <summary>
-    /// Funcionário (réplica de fonte Java). Não altere schema/colunas daqui.
+    /// Representa um funcionário associado a um pátio (dados sincronizados de origem externa).
     /// </summary>
     [Table("FUNCIONARIOS_SYNC")]
     [Index(nameof(Email), IsUnique = true)]

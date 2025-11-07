@@ -7,6 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Csharp.Api.Services
 {
+    /// <summary>
+    /// Implementação do serviço de Beacons.
+    /// Fornece operações CRUD e regras de negócio relacionadas a dispositivos Beacon.
+    /// </summary>
     public class BeaconService : IBeaconService
     {
         private readonly AppDbContext _context;
@@ -18,7 +22,13 @@ namespace Csharp.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<PaginatedResponseDto<BeaconDto>> GetAllBeaconsAsync(int page, int pageSize)
+    /// <summary>
+    /// Retorna uma página de beacons cadastrados.
+    /// </summary>
+    /// <param name="page">Número da página (1-based).</param>
+    /// <param name="pageSize">Tamanho da página.</param>
+    /// <returns>Lista paginada de <see cref="BeaconDto"/>.</returns>
+    public async Task<PaginatedResponseDto<BeaconDto>> GetAllBeaconsAsync(int page, int pageSize)
         {
             if (page < 1 || pageSize < 1)
                 throw new EntradaInvalidaException("Os parâmetros 'page' e 'pageSize' devem ser maiores que zero.");
@@ -43,14 +53,24 @@ namespace Csharp.Api.Services
             };
         }
 
-        public async Task<BeaconDto> GetBeaconByIdAsync(Guid id)
+    /// <summary>
+    /// Obtém um beacon por seu identificador interno (GUID).
+    /// </summary>
+    /// <param name="id">Identificador do beacon.</param>
+    /// <returns>Dados do beacon.</returns>
+    public async Task<BeaconDto> GetBeaconByIdAsync(Guid id)
         {
             var beacon = await _context.Beacons.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
             if (beacon == null) throw new BeaconNotFoundException(id);
             return _mapper.Map<BeaconDto>(beacon);
         }
 
-        public async Task<BeaconDto> GetBeaconByBeaconIdAsync(string beaconId)
+    /// <summary>
+    /// Obtém um beacon pelo seu código público (BeaconId).
+    /// </summary>
+    /// <param name="beaconId">Código público do beacon.</param>
+    /// <returns>Dados do beacon.</returns>
+    public async Task<BeaconDto> GetBeaconByBeaconIdAsync(string beaconId)
         {
             var key = beaconId.ToUpperInvariant();
             var beacon = await _context.Beacons.AsNoTracking()
@@ -60,7 +80,12 @@ namespace Csharp.Api.Services
             return _mapper.Map<BeaconDto>(beacon);
         }
 
-        public async Task<BeaconDto> CreateBeaconAsync(CreateBeaconDto createBeaconDto)
+    /// <summary>
+    /// Cria um novo beacon.
+    /// </summary>
+    /// <param name="createBeaconDto">DTO com os dados de criação.</param>
+    /// <returns>Beacon criado.</returns>
+    public async Task<BeaconDto> CreateBeaconAsync(CreateBeaconDto createBeaconDto)
         {
             var key = createBeaconDto.BeaconId.ToUpperInvariant();
 
@@ -76,7 +101,13 @@ namespace Csharp.Api.Services
             return _mapper.Map<BeaconDto>(beacon);
         }
 
-        public async Task<BeaconDto> UpdateBeaconAsync(Guid id, UpdateBeaconDto updateBeaconDto)
+    /// <summary>
+    /// Atualiza os dados de um beacon existente.
+    /// </summary>
+    /// <param name="id">Identificador do beacon.</param>
+    /// <param name="updateBeaconDto">DTO com os campos a atualizar.</param>
+    /// <returns>Beacon atualizado.</returns>
+    public async Task<BeaconDto> UpdateBeaconAsync(Guid id, UpdateBeaconDto updateBeaconDto)
         {
             var beacon = await _context.Beacons.FirstOrDefaultAsync(b => b.Id == id);
             if (beacon == null) throw new BeaconNotFoundException(id);
@@ -87,7 +118,11 @@ namespace Csharp.Api.Services
             return _mapper.Map<BeaconDto>(beacon);
         }
 
-        public async Task DeleteBeaconAsync(Guid id)
+    /// <summary>
+    /// Remove um beacon do sistema.
+    /// </summary>
+    /// <param name="id">Identificador do beacon a remover.</param>
+    public async Task DeleteBeaconAsync(Guid id)
         {
             var beacon = await _context.Beacons.FirstOrDefaultAsync(b => b.Id == id);
             if (beacon == null) throw new BeaconNotFoundException(id);

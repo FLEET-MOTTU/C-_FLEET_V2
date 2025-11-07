@@ -21,11 +21,8 @@ namespace Csharp.Api.Entities
 
         public bool Ativo { get; set; }
 
-        /// <summary>
-        /// Campo legado/livre para debug humano (opcional). Use ZonaId para lógica formal.
-        /// </summary>
-        [StringLength(100)]
-        public string? UltimaZonaDetectada { get; set; }
+    [StringLength(100)]
+    public string? UltimaZonaDetectada { get; set; }
 
         public DateTime? UltimaVezVisto { get; set; }
 

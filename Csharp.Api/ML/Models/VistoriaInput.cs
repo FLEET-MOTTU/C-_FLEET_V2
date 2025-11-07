@@ -4,13 +4,17 @@ namespace Csharp.Api.ML.Models
 {
     public class VistoriaInput
     {
-        // Coluna 0: A feature que usamos para prever
+        /// <summary>
+        /// Nome/modelo do veículo usado como feature de entrada.
+        /// Mapeado para a coluna 0 do arquivo de dados/feature set.
+        /// </summary>
         [LoadColumn(0)]
         public string Modelo { get; set; } = string.Empty;
 
-        // Coluna 1: A Label que o schema do modelo espera
-        // (Mesmo que não seja usada para *prever*, ela precisa estar aqui
-        // para o schema bater com o do 'model.zip')
+        /// <summary>
+        /// Label esperada pelo schema do modelo (coluna 1).
+        /// Não é usada para inferência, mas necessária para manter o schema compatível com o arquivo do modelo.
+        /// </summary>
         [LoadColumn(1)]
         public bool Label { get; set; }
     }

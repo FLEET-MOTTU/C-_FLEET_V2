@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Csharp.Api.Entities
 {
     /// <summary>
-    /// Histórico de passagem/posicionamento da moto pelas Zonas do pátio.
+    /// Registro histórico de entradas/saídas de motos nas zonas do pátio (auditoria de posição).
     /// </summary>
     [Table("MOTO_ZONA_HIST")]
     [Index(nameof(MotoId), nameof(EntradaEm))]
@@ -22,8 +22,7 @@ namespace Csharp.Api.Entities
         [Required]
         public Guid ZonaId { get; set; }
 
-        /// <summary>Funcionário responsável no evento (opcional, p/ auditoria).</summary>
-        public Guid? FuncionarioId { get; set; }
+    public Guid? FuncionarioId { get; set; }
 
         [Required]
         public DateTime EntradaEm { get; set; }

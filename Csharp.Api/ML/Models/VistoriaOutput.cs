@@ -4,17 +4,18 @@ namespace Csharp.Api.ML.Models
 {
     public class VistoriaOutput
     {
-        // Esta é a previsão final (true ou false)
-        // O seu 'ModelTrainer' antigo (que gerou o model.zip) tinha a linha:
-        // .Append(mlContext.Transforms.Conversion.MapKeyToValue("Prediction"));
-        // ... então esta propriedade deve estar correta.
+        /// <summary>
+        /// Resultado da previsão binária gerada pelo modelo ML.
+        /// true indica que o veículo provavelmente precisa de reparo/vistoria complexo.
+        /// </summary>
         [ColumnName("Prediction")]
         public bool PrecisaReparoComplexo { get; set; }
 
-        // --- A CORREÇÃO ESTÁ AQUI ---
-        // O log de erro disse que 'Score' é um 'Vector<Single, 2>'.
-        // Nós mapeamos isso para um array de floats (float[]).
+        /// <summary>
+        /// Vetor de probabilidades/score retornado pelo modelo (por exemplo, [p0, p1]).
+        /// Mapeado do schema ML como um vetor de float; inicializado para evitar aviso de não anulabilidade.
+        /// </summary>
         [ColumnName("Score")]
-        public float[] Score { get; set; }
+        public float[] Score { get; set; } = System.Array.Empty<float>();
     }
 }

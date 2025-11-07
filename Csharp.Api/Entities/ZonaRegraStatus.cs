@@ -7,7 +7,7 @@ using Csharp.Api.Entities.Enums;
 namespace Csharp.Api.Entities
 {
     /// <summary>
-    /// Regras de roteamento por status → zona (por pátio), com prioridade.
+    /// Regra que associa um status de moto a uma zona do pátio, com prioridade para ordenação.
     /// </summary>
     [Table("ZONA_REGRA_STATUS")]
     [Index(nameof(PateoId), nameof(StatusMoto), nameof(Prioridade), IsUnique = true)]
@@ -26,9 +26,8 @@ namespace Csharp.Api.Entities
         [Required]
         public Guid ZonaId { get; set; }
 
-        /// <summary>Menor número = maior prioridade.</summary>
-        [Required]
-        public int Prioridade { get; set; }
+    [Required]
+    public int Prioridade { get; set; }
 
         [ForeignKey(nameof(ZonaId))]
         public virtual Zona Zona { get; set; } = null!;

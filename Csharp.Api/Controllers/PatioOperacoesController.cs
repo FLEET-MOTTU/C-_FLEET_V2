@@ -30,9 +30,12 @@ namespace Csharp.Api.Controllers
             _classificador = classificador;
         }
 
-        /// <summary>
-        /// Classifica um lote de motos por status e sugere zonas do pátio (ZONA_REGRA_STATUS).
-        /// </summary>
+    /// <summary>
+    /// Classifica um lote de motos por status e sugere zonas do pátio com base em regras.
+    /// </summary>
+    /// <param name="pateoId">ID do pátio onde a classificação será aplicada.</param>
+    /// <param name="request">Dados do lote a ser classificado.</param>
+    /// <returns>200 OK com <see cref="LoteClassificacaoRespostaDto"/> contendo as sugestões de zona.</returns>
         [HttpPost("{pateoId:guid}/classificar-motos")]
         [ProducesResponseType(typeof(LoteClassificacaoRespostaDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
