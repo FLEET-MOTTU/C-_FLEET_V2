@@ -53,20 +53,20 @@ A API agora implementa um **CRUD completo** para as entidades `Moto` (junto de s
     - Data (AppDbContext): configuração e mapeamento do EF Core para Oracle
     - DTOs e Profiles (AutoMapper) para mapeamento entre entidades e respostas
 
-    Observação importante sobre execução: a API precisa ser executada via Docker Compose (docker compose up --build) no ambiente atual do repositório — sem o Compose a classe Program.cs não conseguirá ler as váriaveis de ambiente (.env) pois o código já está adaptado para produção com deploy no Azure Container Instace (ACI).
+    * Observação importante sobre execução: a API precisa ser executada via Docker Compose (docker compose up --build) no ambiente atual do repositório — sem o Compose a classe Program.cs não conseguirá ler as váriaveis de ambiente (.env) pois o código já está adaptado para produção com deploy no Azure Container Instace (ACI).
 
-    Conteúdo desta README
+    ## Conteúdo desta README
     - Como executar a API (via Docker Compose)
     - Como rodar os testes (unitários e de integração)
     - Como acessar o Swagger e onde encontrar a documentação gerada
     - Como trabalhar com migrations do EF Core
     - Notas sobre integração com Java e "listeners"/consumidores de eventos
 
-    Pré-requisitos
+    ## Pré-requisitos
     - Docker Desktop (Windows) com Compose v2
     - Credenciais para conexão com Oracle (usadas por containers ou variáveis de ambiente)
 
-    Executando a API (recomendado: Docker Compose)    
+    ## Executando a API (recomendado: Docker Compose)    
     1) Ajuste segredos/variáveis:
          - Crie um arquivo .env na raiz da pasta Csharp.Api, conforme o .env.example
     3) Construa e inicie os containers:
@@ -81,9 +81,9 @@ A API agora implementa um **CRUD completo** para as entidades `Moto` (junto de s
     http://localhost:8080/swagger/index.html
     ```
 
-    Se você precisa executar apenas localmente sem Docker (não recomendado): abra `Csharp.Api` e siga os passos de configuração de `user-secrets` para a string de conexão. Algumas dependências de runtime podem não estar disponíveis e a aplicação pode falhar ao aplicar migrations automaticamente.
+    * Se você precisa executar apenas localmente sem Docker (não recomendado): abra `Csharp.Api` e siga os passos de configuração de `user-secrets` para a string de conexão. Algumas dependências de runtime podem não estar disponíveis e a aplicação pode falhar ao aplicar migrations automaticamente.
 
-    Rodando os testes
+    ## Rodando os testes
     - Tests unitários e de integração são projetos separados na solução.
     - Para rodar todos os testes localmente (dotnet SDK instalado):
     - OU navegue até a pasta raiz do projeto (onde está este README e as 3 pastas Csharp.Api, Csharp.Api.Tests...) e rode:
@@ -100,7 +100,7 @@ A API agora implementa um **CRUD completo** para as entidades `Moto` (junto de s
     dotnet test Csharp.Api.Tests.Unit\Csharp.Api.Tests.Unit.csproj -c Debug
     ```
 
-    Swagger / OpenAPI
+    ## Swagger / OpenAPI
     - A documentação OpenAPI é gerada automaticamente via Swashbuckle.
     - Os comentários XML (que você verá no Swagger) são gerados no build em `Csharp.Api/bin/Debug/net8.0/Csharp.Api.xml` e incluídos na geração do Swagger.
     - Endpoints por versão aparecem no Swagger UI (o projeto usa API Versioning; haverá um documento por versão descoberta. VERSÃO ATUAL: 2.0).
@@ -114,14 +114,37 @@ A API agora implementa um **CRUD completo** para as entidades `Moto` (junto de s
 
     - Os arquivos de migration são gerados em `Csharp.Api/Migrations`. Ao iniciar os containers a API tenta aplicar `dbContext.Database.Migrate()` automaticamente.
 
-    Integração com Java e "Listeners"
+
+    ## COMO OBTER UMA JWT VÁLLIDA E TESTAR OS ENPOINTS AUTENTICADOS
+
+    O cadastro de novos funcionário em um pátio é feito através da API responsável pelas funcionalidades do ADMIN MOTTU (Java), o login do funcionário é feito via magiclink, a responsabilidade desta API é apenas validar as claims dos tokens gerados pela API de java 
+
+    Como gerar o token:
+    - Acesse o Painel de Super Admin da API de JAVA: [Link]http://fleet-app-journeytiago7.westus2.azurecontainer.io:8080/login
+    - Acesse o Swagger da API de JAVA: [Link]http://fleet-app-journeytiago7.westus2.azurecontainer.io:8080/swagger-ui/index.html
+    - Logue com as seguintes credenciais no painel de super admin (Email: super@fleet.com / Senha: superadmin123)
+    - Na tela principal (Dashboard de Pátios Ativos) clique no ícone de olho na coluna 'ações' do 'Pátio teste C#' (patio já sincronizado com o banco do C#)
+    - Na tabela de 'Funcionários Cadastrados' gere um novo magic link para o funcionáro Udyr (funcionário já sincronizado com o cando de C#). Será um link neste formato: [Link]http://fleet-app-journeytiago7.westus2.azurecontainer.io:8080/auth/validar-token?valor=uuid-unico
+    - Abra o CMD e execute:
+
+    ```cmd
+    curl.exe -v fleet-app-journeytiago7.westus2.azurecontainer.io:8080/auth/validar-token?valor=uuid-unico
+    ```
+
+    - Nos headers da requisição, em Location, você verá um novo link confirmando o sucesso da operação: [Link]http://fleet-app-journeytiago7.westus2.azurecontainer.io:8080/login-success?code=uuid-unico  (IMPORTANTE: esse código de troca tem validade de apenas 2 minutos, caso ele expire será necessário repetir o processo)
+    - Pegue o valor do código (code=uuid-unico) e no Swagger, utilize o endpoint '/api/auth/exchange-token' para trocar o seu código único por um accesstoken (JWT válida por 24horas que será utilizada para autenticação no Swagger da API de C#) e por um refreshtoken (utilizado pelo endpoint '/api/auth/refresh-token' para obter um novo accesstoken após 24 horas)
+    - Use seu acesstoken para autenticação na API C# via Swagger
+
+
+    ## Integração com Java e Listeners
+
     - Esta API consome eventos publicados pela api de java em uma fila hospedada no Azure Service Bus
         1) funcionario-criado-queue (responsável por eventos de sincronização entre os bancos de dados dos dois microserviços com relação as entidades FUNCIONARIO, PATEO e ZONA, cuja criação é responsabilidade de um administrador de pátio de Mottu, API de Java)
 
     - Esta API consome eventos publicados pelos gateways (beacons) de IoT em uma fila hospedada no Azure Service Bus
         2) tag-position-updates (eventos de tracking das motos dentro de um pátio)
 
-    Notas operacionais e dicas
+    ## Notas operacionais e dicas
     - XML docs: durante o build a documentação XML é gerada e incluída no Swagger, então sempre rode `dotnet build` após alterar comentários para ver o resultado no Swagger.
     - ML: a API contém integração com um modelo ML (ML.NET). Verifique o caminho do `model.zip` no projeto `Csharp.Api/ML` e ajuste o serviço de previsão se renomear ou re-treinar o modelo.
 
@@ -143,7 +166,7 @@ A API agora implementa um **CRUD completo** para as entidades `Moto` (junto de s
 
     ## OPCIONAL
 
-    Caso a api não rode localmente por quaisquer motivos ela está hospedada na Azure Cloud e é acessível através da URL:
+    Caso a api não rode localmente por quaisquer motivos ela está hospedada na Azure Cloud e é acessível através da URL: (ignore o aviso de depreciação especificamente na Azure, eu não consegui resolver kkk, MAS NO LOCAHOST FUNCIONA)
 
     [Link]http://mottu-csharp-api-tiago.westus2.azurecontainer.io/swagger/index.html
 
